@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Acessibilidade - Lugares Públicos</title>
+    <style>
+        /* Reset e Variáveis */
+        :root {
+            --cor-primaria: #005a9c;
+            --cor-secundaria: #4caf50;
+            --cor-erro: #e74c3c;
+            --cor-fundo: #f5f7fa;
+            --cor-branco: #ffffff;
+            --cor-texto: #2c3e50;
+            --cor-sombra: rgba(0, 0, 0, 0.1);
+            --fonte-principal: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --tamanho-fonte: 16px;
+            --espacamento: 1.5rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--fonte-principal);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            line-height: 1.6;
+            color: var(--cor-texto);
+        }
+        
+        /* Container Principal */
+        .container {
+            background-color: var(--cor-branco);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px var(--cor-sombra);
+            max-width: 800px;
+            width: 100%;
+            padding: 2rem;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Cabeçalho */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            color: var(--cor-primaria);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        /* Barra de Progresso */
+        .progresso-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .progresso-barra {
+            background: linear-gradient(90deg, var(--cor-primaria), var(--cor-secundaria));
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+        
+        /* Área do Quiz */
+        .quiz-container {
+            display: none;
+        }
+        
+        .quiz-container.active {
+            display: block;
+        }
+        
+        .numero-pergunta {
+            color: var(--cor-primaria);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .texto-pergunta {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--cor-texto);
+        }
+        
+        /* Opções */
+        .opcoes {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .opcao {
+            background-color: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            position: relative;
+        }
+        
+        .opcao:hover:not(.bloqueada) {
+            background-color: #e3f2fd;
+            border-color: var(--cor-primaria);
+            transform: translateX(5px);
+        }
+        
+        .opcao.correta {
+            background-color: #d4edda;
+            border-color: var(--cor-secundaria);
+            color: #155724;
+        }
+        
+        .opcao.incorreta {
+            background-color: #f8d7da;
+            border-color: var(--cor-erro);
+            color: #721c24;
+        }
+        
+        .opcao.bloqueada {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
+        .opcao.bloqueada.correta {
+            opacity: 1;
+            font-weight: bold;
+        }
+        
+        /* Feedback */
+        .feedback {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 10px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .feedback.mostrar {
+            display: block;
+        }
+        
+        .feedback.correto {
+            background-color: #d4edda;
+            border: 1px solid var(--cor-secundaria);
+        }
+        
+        .feedback.errado {
+            background-color: #f8d7da;
+            border: 1px solid var(--cor-erro);
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Botão Próximo */
+        .btn-proximo {
+            background-color: var(--cor-primaria);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            width: 100%;
+            transition: background-color 0.3s ease;
+            display: none;
+        }
+        
+        .btn-proximo:hover {
+            background-color: #003d6b;
+        }
+        
+        .btn-proximo.mostrar {
+            display: block;
+        }
+        
+        /* Tela de Resultado */
+        .resultado {
+            display: none;
+            text-align: center;
+        }
+        
+        .resultado.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .resultado h2 {
+            color: var(--cor-primaria);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .pontuacao {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--cor-secundaria);
+        }
+        
+        .mensagem-resultado {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+        }
+        
+        .btn-reiniciar {
+            background-color: var(--cor-secundaria);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-reiniciar:hover {
+            background-color: #388e3c;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .texto-pergunta {
+                font-size: 1.1rem;
+            }
+            
+            .opcao {
+                font-size: 1rem;
+                padding: 0.8rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" role="main">
+        <!-- Cabeçalho -->
+        <div class="header">
+            <h1>🎯 Quiz de Acessibilidade</h1>
+            <p>Teste seus conhecimentos sobre acessibilidade em lugares públicos</p>
+        </div>
+        
+        <!-- Barra de Progresso -->
+        <div class="progresso-container">
+            <div class="progresso-barra" id="barraProgresso" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        
+        <!-- Quiz -->
+        <div id="quiz" class="quiz-container active"></div>
+        
+        <!-- Resultado -->
+        <div id="resultado" class="resultado"></div>
+    </div>
+
+    <script>
+        const perguntas = [
+            {
+                pergunta: "Um hospital público inaugura um novo andar, mas não há intérprete de Libras disponível para ajudar pacientes surdos no balcão de informações. Qual tipo de barreira de acessibilidade está sendo imposta?",
+                opcoes: ["Barreira arquitetônica", "Barreira comunicacional", "Barreira urbanística", "Barreira tecnológica"],
+                correta: 1,
+                explicacao: "Barreiras comunicacionais são entraves na troca de mensagens. A falta de intérprete impede a comunicação com pessoas surdas."
+            },
+            {
+                pergunta: "Ao projetar a calçada em frente a uma escola, qual recurso é essencial para garantir a segurança na travessia de alunos com deficiência visual?",
+                opcoes: ["Piso tátil direcional e de alerta", "Placas de sinalização com cores vibrantes", "Rampas exclusivas para cadeirantes", "Faixa de pedestres elevada"],
+                correta: 0,
+                explicacao: "O piso tátil (podotátil) é um recurso de sinalização tátil previsto na NBR 9050 para orientar e alertar pessoas com deficiência visual."
+            },
+            {
+                pergunta: "Em uma prefeitura, os totens de autoatendimento têm apenas tela sensível ao toque, sem áudio ou teclado. Uma pessoa cega deseja emitir um documento sozinha. Qual medida resolve essa barreira tecnológica?",
+                opcoes: ["Colocar um funcionário para emitir o documento enquanto a pessoa espera sentada.", "Instalar um software leitor de tela e teclado adaptado no totem.", "Oferecer um fone de ouvido descartável para não incomodar outros usuários.", "Abaixar a altura do totem para facilitar o alcance."],
+                correta: 1,
+                explicacao: "Softwares leitores de tela (como NVDA ou DOSVOX) transformam texto em fala, permitindo autonomia no uso digital."
+            },
+            {
+                pergunta: "Uma praça pública reformada tem rampas, mas a lixeira está no meio do rebaixamento da calçada e o banheiro adaptado está trancado. Que princípio essencial da NBR 9050 está sendo desrespeitado?",
+                opcoes: ["Segurança, pois atrai insetos.", "Autonomia, pela obstrução e falta de chave.", "Conforto, pelo mau cheiro do lixo.", "Estética, pois polui a paisagem urbana."],
+                correta: 1,
+                explicacao: "Autonomia é um dos três pilares da NBR 9050 e garante o uso independente do espaço."
+            },
+            {
+                pergunta: "Segundo a LBI, qual atitude caracteriza uma 'barreira atitudinal' enraizada no capacitismo, afetando a participação social da pessoa com deficiência?",
+                opcoes: ["Um site público sem conformidade com os padrões do WCAG.", "Um motorista de ônibus se recusar a operar o elevador para cadeirante alegando atraso na linha.", "Uma rampa com inclinação superior a 8,33% exigida pela NBR 9050.", "Um semáforo sem sinal sonoro em via de grande movimento."],
+                correta: 1,
+                explicacao: "Barreiras atitudinais são atitudes ou comportamentos preconceituosos que discriminam."
+            },
+            {
+                pergunta: "Em um teatro público, qual recurso permite que uma pessoa cega compreenda cenas de um filme onde não há diálogos?",
+                opcoes: ["Legenda descritiva (Closed Caption)", "Janela de Libras", "Audiodescrição", "Língua de sinais tátil"],
+                correta: 2,
+                explicacao: "A audiodescrição é a faixa de áudio que descreve elementos visuais importantes para pessoas cegas ou com baixa visão."
+            },
+            {
+                pergunta: "Em uma clínica médica, uma pessoa com deficiência intelectual leve chega para consulta, mas tem dificuldade em preencher a ficha com termos complexos. Qual é a abordagem correta para remover essa barreira?",
+                opcoes: ["Preencher tudo sem perguntar, pois a pessoa está confusa.", "Usar linguagem simples, pictogramas e explicar os termos com calma.", "Pedir que um familiar vá buscá-la, pois não se pode fazer nada.", "Entregar um tablet com o formulário digital, pois tecnologia resolve tudo."],
+                correta: 1,
+                explicacao: "A acessibilidade para deficiência intelectual envolve adaptação metodológica e comunicacional, garantindo o direito à informação."
+            },
+            {
+                pergunta: "A NBR 9050 especifica dimensões mínimas para boxes de banheiros acessíveis. Qual o objetivo principal de se exigir um raio de giro de 360° para cadeira de rodas nesses espaços?",
+                opcoes: ["Para que duas cadeiras de rodas usem o box ao mesmo tempo.", "Para permitir o conforto térmico no ambiente.", "Para garantir a manobra e o uso seguro do sanitário de forma autônoma.", "Para atender à exigência de instalação de barras de apoio em todas as paredes."],
+                correta: 2,
+                explicacao: "O espaço para giro de 360° assegura que a pessoa possa manobrar a cadeira com autonomia e segurança."
+            },
+            {
+                pergunta: "Uma pessoa com mobilidade reduzida vai usar o metrô, mas o elevador da estação está quebrado há meses. Além da barreira arquitetônica, qual outra barreira grave isso caracteriza, segundo a LBI?",
+                opcoes: ["Uma barreira comunicacional, pois não foi avisada previamente.", "Uma barreira nos transportes, pois o sistema está inacessível na prática.", "Uma falha de segurança, pois elevadores quebrados são perigosos.", "Um problema temporário, sem implicações legais sérias."],
+                correta: 1,
+                explicacao: "A LBI define barreiras nos transportes como entraves nos sistemas de mobilidade. Serviço inoperante configura essa barreira."
+            },
+            {
+                pergunta: "Para promover a autonomia de um aluno cadeirante, qual adaptação arquitetônica é indispensável na entrada e no interior de uma escola?",
+                opcoes: ["Portas com maçanetas do tipo alavanca e rampas de acesso.", "Bebedouros do tipo jato inclinado e corrimãos nas paredes.", "Piso tátil e mapas em braille nos corredores.", "Cartazes com fontes ampliadas e alto contraste."],
+                correta: 0,
+                explicacao: "Rampas e maçanetas de alavanca são itens previstos na NBR 9050 para vencer desníveis e facilitar o manuseio."
+            }
+        ];
+        
+        let perguntaAtual = 0;
+        let pontuacao = 0;
+        let respondida = false;
+        
+        const quizElement = document.getElementById('quiz');
+        const resultadoElement = document.getElementById('resultado');
+        const barraProgresso = document.getElementById('barraProgresso');
+        
+        function iniciarQuiz() {
+            perguntaAtual = 0;
+            pontuacao = 0;
+            respondida = false;
+            quizElement.classList.add('active');
+            resultadoElement.classList.remove('active');
+            mostrarPergunta();
+            atualizarProgresso();
+        }
+        
+        function mostrarPergunta() {
+            respondida = false;
+            const questao = perguntas[perguntaAtual];
+            
+            let html = `
+                <div class="numero-pergunta">Pergunta ${perguntaAtual + 1} de ${perguntas.length}</div>
+                <div class="texto-pergunta">${questao.pergunta}</div>
+                <ul class="opcoes" role="radiogroup" aria-label="Opções de resposta">
+            `;
+            
+            questao.opcoes.forEach((opcao, index) => {
+                html += `
+                    <li class="opcao" 
+                        role="radio" 
+                        aria-checked="false" 
+                        tabindex="0" 
+                        onclick="selecionarResposta(${index})"
+                        onkeypress="if(event.key === 'Enter') selecionarResposta(${index})">
+                        <strong>${String.fromCharCode(65 + index)}.</strong> ${opcao}
+                    </li>
+                `;
+            });
+            
+            html += `</ul>
+                <div class="feedback" id="feedback" role="alert"></div>
+                <button class="btn-proximo" id="btnProximo" onclick="proximaPergunta()">
+                    ${perguntaAtual === perguntas.length - 1 ? 'Ver Resultado 🎯' : 'Próxima Pergunta →'}
+                </button>
+            `;
+            
+            quizElement.innerHTML = html;
+            atualizarProgresso();
+        }
+        
+        function selecionarResposta(index) {
+            if (respondida) return;
+            respondida = true;
+            
+            const questao = perguntas[perguntaAtual];
+            const opcoes = document.querySelectorAll('.opcao');
+            const feedback = document.getElementById('feedback');
+            const btnProximo = document.getElementById('btnProximo');
+            
+            opcoes.forEach(opcao => opcao.classList.add('bloqueada'));
+            
+            if (index === questao.correta) {
+                opcoes[index].classList.add('correta');
+                feedback.className = 'feedback mostrar correto';
+                feedback.innerHTML = `✅ <strong>Correto!</strong><br>${questao.explicacao}`;
+                pontuacao++;
+            } else {
+                opcoes[index].classList.add('incorreta');
+                opcoes[questao.correta].classList.add('correta');
+                feedback.className = 'feedback mostrar errado';
+                feedback.innerHTML = `❌ <strong>Incorreto!</strong><br>${questao.explicacao}`;
+                opcoes[index].setAttribute('aria-invalid', 'true');
+            }
+            
+            btnProximo.classList.add('mostrar');
+            btnProximo.focus();
+        }
+        
+        function proximaPergunta() {
+            perguntaAtual++;
+            
+            if (perguntaAtual < perguntas.length) {
+                mostrarPergunta();
+            } else {
+                mostrarResultado();
+            }
+        }
+        
+        function mostrarResultado() {
+            quizElement.classList.remove('active');
+            resultadoElement.classList.add('active');
+            
+            const porcentagem = Math.round((pontuacao / perguntas.length) * 100);
+            
+            let mensagem = '';
+            if (porcentagem >= 90) {
+                mensagem = '🏆 Incrível! Você é um especialista em acessibilidade!';
+            } else if (porcentagem >= 70) {
+                mensagem = '👏 Muito bom! Seu conhecimento sobre acessibilidade é sólido!';
+            } else if (porcentagem >= 50) {
+                mensagem = '📚 Você está no caminho certo, continue estudando!';
+            } else {
+                mensagem = '💡 Vale a pena aprender mais sobre este tema tão importante!';
+            }
+            
+            resultadoElement.innerHTML = `
+                <h2>Quiz Concluído!</h2>
+                <div class="pontuacao">${porcentagem}%</div>
+                <p class="mensagem-resultado">${mensagem}</p>
+                <p>Você acertou <strong>${pontuacao}</strong> de <strong>${perguntas.length}</strong> perguntas.</p>
+                <button class="btn-reiniciar" onclick="iniciarQuiz()" aria-label="Tentar novamente">
+                    🔄 Tentar Novamente
+                </button>
+            `;
+            
+            barraProgresso.style.width = '100%';
+            barraProgresso.setAttribute('aria-valuenow', 100);
+        }
+        
+        function atualizarProgresso() {
+            const progresso = ((perguntaAtual) / perguntas.length) * 100;
+            barraProgresso.style.width = progresso + '%';
+            barraProgresso.setAttribute('aria-valuenow', Math.round(progresso));
+        }
+        
+        // Iniciar o quiz
+        iniciarQuiz();
+        
+        // Acessibilidade: Suporte a navegação por teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                const opcoes = document.querySelectorAll('.opcao:not(.bloqueada)');
+                if (opcoes.length > 0) {
+                    e.preventDefault();
+                    const focoAtual = document.activeElement;
+                    const indexAtual = Array.from(opcoes).indexOf(focoAtual);
+                    
+                    if (e.key === 'ArrowDown') {
+                        const nextIndex = (indexAtual + 1) % opcoes.length;
+                        opcoes[nextIndex].focus();
+                    } else {
+                        const prevIndex = (indexAtual - 1 + opcoes.length) % opcoes.length;
+                        opcoes[prevIndex].focus();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
