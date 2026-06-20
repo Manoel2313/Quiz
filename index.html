@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Projeto O₂: Ascensão · Edição Imersiva</title>
+  <title>Projeto O₂: Ascensão · Imersivo</title>
   <style>
     :root {
       --bg: #0b0e0c;
@@ -18,7 +18,6 @@
       --leaf: #6bbf6b;
       --leaf-glow: #6bbf6b66;
       --panel: rgba(18, 22, 18, 0.8);
-      --panel-light: rgba(28, 32, 26, 0.75);
       --border: rgba(220, 200, 140, 0.15);
       --border-active: rgba(230, 180, 70, 0.5);
       --text: #e0dac8;
@@ -48,7 +47,6 @@
       max-width: 780px;
       background: rgba(18, 22, 18, 0.7);
       backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
       border: 1px solid var(--border);
       border-radius: 32px;
       padding: 2rem 2rem 1.8rem;
@@ -59,7 +57,6 @@
       flex-direction: column;
       gap: 1.4rem;
     }
-    /* temas por tela */
     .theme-bunker {
       border-color: rgba(230, 180, 70, 0.4);
       box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 40px rgba(230, 180, 70, 0.2);
@@ -86,16 +83,10 @@
       background: rgba(14, 22, 26, 0.8);
     }
     .hidden { display:none !important; }
-
-    h1, h2 {
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
     h2 {
+      font-weight: 600;
       font-size: 1.9rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      letter-spacing: 0.5px;
     }
     .status-row {
       display: flex;
@@ -181,18 +172,6 @@
       border-color: rgba(230,180,70,0.35);
     }
     .btn-disabled { opacity:0.4; pointer-events:none; }
-
-    .mute-btn {
-      position: absolute;
-      top: 20px;
-      right: 70px;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #aaa;
-      z-index: 10;
-    }
     .inv-btn {
       position: absolute;
       top: 20px;
@@ -207,12 +186,28 @@
       z-index: 10;
     }
     .character-mood {
-      display: flex;
-      align-items: center;
-      gap: 8px;
       font-size: 0.9rem;
       color: var(--text-dim);
       margin-bottom: 6px;
+    }
+    .inv-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+    .inv-item-row span { font-weight: 600; }
+    .inv-use-btn {
+      background: var(--gold);
+      border: none;
+      color: #000;
+      padding: 6px 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
     }
     @media (max-width:600px) {
       #game-container { padding:1.5rem; }
@@ -222,7 +217,6 @@
 </head>
 <body>
 <div id="game-container">
-  <button class="mute-btn" id="muteToggle" title="Som">🔊</button>
   <button class="inv-btn" id="openInventoryBtn">🎒 Inventário</button>
 
   <!-- TELA INÍCIO -->
@@ -262,44 +256,21 @@
 
   <!-- INVENTÁRIO -->
   <div id="screen-inventory" class="hidden">
-    <h2 style="color:#9ad0e0;">🎒 Equipamento</h2>
+    <h2 style="color:#9ad0e0;">🎒 Inventário</h2>
     <div id="invContent"></div>
-    <button class="choice-btn" id="closeInvBtn" style="width:100%; justify-content:center;">Fechar</button>
+    <button class="choice-btn" id="closeInvBtn" style="width:100%; justify-content:center; margin-top:12px;">Fechar</button>
   </div>
 </div>
 
 <script>
   (function() {
-    // ÁUDIO PROCEDURAL
-    let audioCtx = null;
-    let mute = false;
-    function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    function playTone(freq, type='sine', duration=0.15, vol=0.08) {
-      if(mute || !audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type; osc.frequency.value = freq;
-      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(); osc.stop(audioCtx.currentTime + duration);
-    }
-    function ambientDrone() { /* poderia ser contínuo, simplificado */ }
-
-    document.getElementById('muteToggle').addEventListener('click', ()=>{
-      mute=!mute;
-      document.getElementById('muteToggle').textContent = mute ? '🔇' : '🔊';
-      if(!mute) initAudio();
-    });
-
     // ESTADO
     const S = {
       name: '', hp:100, maxHp:100, energy:100, maxEnergy:100, hunger:0, maxHunger:100,
-      coins:25, scrap:0, turn:1, maxTurns:10, vegetation:0,
+      coins:0, scrap:0, turn:1, maxTurns:10, vegetation:0,
       inventory: { food:3, medkit:1, sensor:0, grenade:0, seeds:0 },
-      suitLvl:0, mutantWounded:false, mutantHp:0, mutantType:null,
+      suitLvl:0, mutantWounded:false, mutantHp:0,
       currentScreen:'start', previousScreen:null,
-      ongoingEvent:null, eventTimer:0,
     };
 
     const container = document.getElementById('game-container');
@@ -314,7 +285,6 @@
       setTheme(theme||'');
     }
 
-    // HELPERS
     const vegBar = document.getElementById('vegBar');
     const vegPercent = document.getElementById('vegPercent');
     function updateVegUI() { vegBar.style.width = S.vegetation+'%'; vegPercent.textContent = S.vegetation+'%'; }
@@ -338,7 +308,9 @@
     const logDiv = document.getElementById('surfaceLog');
     function addLog(msg, cls='') {
       const d = document.createElement('div'); d.textContent = msg;
-      if(cls) d.style.color = cls==='danger'?'#e05a4a':cls==='success'?'#8bc78b':'#b0c0d0';
+      if(cls==='danger') d.style.color='#e05a4a';
+      else if(cls==='success') d.style.color='#8bc78b';
+      else d.style.color='#b0c0d0';
       logDiv.appendChild(d); logDiv.scrollTop = logDiv.scrollHeight;
     }
     function clearLog() { logDiv.innerHTML = ''; }
@@ -359,16 +331,23 @@
       return false;
     }
     function loseExpedition() {
-      S.scrap = 0; S.hp = Math.floor(S.maxHp*0.25); S.energy = Math.floor(S.maxEnergy*0.3);
-      S.hunger = Math.min(S.maxHunger, S.hunger+20);
+      S.scrap = 0;
       returnToBunker();
     }
 
+    function resetStatus() {
+      S.hp = S.maxHp;
+      S.energy = S.maxEnergy;
+      S.hunger = 0;
+    }
+
     function returnToBunker() {
-      S.coins += S.scrap; S.scrap = 0;
+      S.coins += S.scrap;
+      S.scrap = 0;
       S.vegetation = Math.min(100, S.vegetation + 5);
       if(S.inventory.seeds>0) { S.vegetation = Math.min(100, S.vegetation + S.inventory.seeds*2); S.inventory.seeds=0; }
       updateVegUI();
+      resetStatus(); // Vida, energia, fome resetados ao voltar
       document.getElementById('bunkerInfo').innerHTML = `🔋 Vida ${S.hp}/${S.maxHp} · ⚡ ${S.energy} · 🍖 ${S.hunger} · 💰 ${S.coins} moedas`;
       renderBunkerShop();
       showScreen('bunker','bunker');
@@ -376,34 +355,17 @@
     }
 
     function victory() {
-      showScreen('bunker','bunker');
       document.getElementById('bunkerInfo').innerHTML = '<h2 style="color:#8bc78b;">🌍 VITÓRIA! A Terra respira novamente.</h2>';
     }
 
     function nextTurn() {
       if(checkGameOver()) return;
-      S.turn++; S.hunger = Math.min(S.maxHunger, S.hunger+5);
-      if(S.ongoingEvent) advanceEvent();
+      S.turn++;
+      S.hunger = Math.min(S.maxHunger, S.hunger+5);
       if(S.turn > S.maxTurns) { addLog('⏳ Oxigênio esgotado. Retorno forçado.','danger'); S.hp-=5; returnToBunker(); return; }
       moodText();
       addLog(`Turno ${S.turn}/${S.maxTurns}`);
       generateSurfaceChoices();
-    }
-
-    // EVENTOS ENCADEADOS
-    function startEvent(type) {
-      S.ongoingEvent = type; S.eventTimer = 0;
-    }
-    function advanceEvent() {
-      if(!S.ongoingEvent) return;
-      S.eventTimer++;
-      if(S.ongoingEvent==='storm') {
-        if(S.eventTimer===1) addLog('🌪️ O céu escurece... tempestade tóxica se aproxima.');
-        else if(S.eventTimer===2) {
-          addLog('☠️ Chuva ácida! Precisa de abrigo ou sofrerá dano.','danger');
-          // forçar escolha de abrigo na próxima rodada
-        }
-      }
     }
 
     const locations = [
@@ -454,24 +416,32 @@
 
     function actionEat() {
       if(S.inventory.food<=0) return;
-      S.inventory.food--; S.hunger = Math.max(0, S.hunger-40); S.energy = Math.min(S.maxEnergy, S.energy+20);
-      addLog('🍞 Ração consumida.','success'); playTone(600,'sine',0.12,0.06);
+      S.inventory.food--;
+      S.hunger = Math.max(0, S.hunger-40);
+      S.energy = Math.min(S.maxEnergy, S.energy+20);
+      addLog('🍞 Ração consumida.','success');
       nextTurn();
     }
     function actionSleep() {
-      let rec = Math.floor(Math.random()*16)+30; S.energy = Math.min(S.maxEnergy, S.energy+rec); S.hunger = Math.max(0, S.hunger-15);
-      addLog(`💤 Dormiu. +${rec} energia.`); nextTurn();
+      let rec = Math.floor(Math.random()*16)+30;
+      S.energy = Math.min(S.maxEnergy, S.energy+rec);
+      S.hunger = Math.max(0, S.hunger-15);
+      addLog(`💤 Dormiu. +${rec} energia.`);
+      nextTurn();
     }
     function actionRest() {
-      let rec = Math.floor(Math.random()*11)+20; S.energy = Math.min(S.maxEnergy, S.energy+rec);
-      addLog(`🛌 Descansou. +${rec} energia.`); nextTurn();
+      let rec = Math.floor(Math.random()*11)+20;
+      S.energy = Math.min(S.maxEnergy, S.energy+rec);
+      addLog(`🛌 Descansou. +${rec} energia.`);
+      nextTurn();
     }
     function actionSearch() {
-      S.energy-=12; S.hunger+=8; addLog('🔍 Vasculhando...');
+      S.energy-=12; S.hunger+=8;
+      addLog('🔍 Vasculhando...');
       if(checkGameOver()) return;
-      if(Math.random()<0.4) { addLog('⚠️ Mutante!','danger'); startCombat('random'); return; }
+      if(Math.random()<0.4) { addLog('⚠️ Mutante!','danger'); startCombat(); return; }
       let amount = Math.floor(Math.random()*5)+2; S.scrap+=amount;
-      addLog(`Encontrou ${amount} sucatas.`,'success'); playTone(800,'triangle',0.1,0.05);
+      addLog(`Encontrou ${amount} sucatas.`,'success');
       nextTurn();
     }
     function actionGoLocation() {
@@ -479,21 +449,19 @@
       if(checkGameOver()) return;
       let loc = locations[Math.floor(Math.random()*locations.length)];
       addLog(`📍 ${loc.name}: ${loc.desc}`);
-      if(Math.random()<loc.danger) { addLog('Mutante no local!','danger'); startCombat(loc.name); return; }
+      if(Math.random()<loc.danger) { addLog('Mutante no local!','danger'); startCombat(); return; }
       let amount = Math.floor(Math.random()*(loc.loot[1]-loc.loot[0]+1))+loc.loot[0];
-      S.scrap+=amount; addLog(`Coletou ${amount} sucatas.`); nextTurn();
+      S.scrap+=amount; addLog(`Coletou ${amount} sucatas.`);
+      nextTurn();
     }
 
-    // COMBATE
-    function startCombat(local) {
+    function startCombat() {
       S.mutantWounded = false;
       S.mutantHp = Math.floor(Math.random()*21)+30;
-      S.mutantType = Math.random()<0.5 ? 'Rastejante' : 'Bruto';
-      document.getElementById('combatDesc').textContent = `Um mutante ${S.mutantType} avança!`;
+      document.getElementById('combatDesc').textContent = 'Um mutante avança!';
       document.getElementById('combatStats').innerHTML = combatStatsHTML();
       showScreen('combat','combat');
       renderCombatChoices();
-      playTone(200,'sawtooth',0.2,0.1);
     }
     function renderCombatChoices() {
       const div = document.getElementById('combatChoices'); div.innerHTML = '';
@@ -538,7 +506,6 @@
       else { addLog('Confronto encerrado.'); nextTurn(); }
     }
 
-    // BUNKER & LOJA
     function renderBunkerShop() {
       const div = document.getElementById('bunkerActions'); div.innerHTML = '';
       const items = [
@@ -566,30 +533,58 @@
       });
     }
 
-    // INVENTÁRIO
+    // INVENTÁRIO MELHORADO
     function openInventory() {
       S.previousScreen = S.currentScreen;
-      document.getElementById('invContent').innerHTML = `
-        <p>💰 ${S.coins} moedas · 📦 Sucata na mão: ${S.scrap}</p>
-        <p>🍞 Rações: ${S.inventory.food} · 💊 Kits: ${S.inventory.medkit} · 📡 Sensores: ${S.inventory.sensor}</p>
-        <p>💣 Granadas: ${S.inventory.grenade} · 🌱 Sementes: ${S.inventory.seeds}</p>
-        <p>🛡️ Traje nível ${S.suitLvl} (Turnos ${10+S.suitLvl*2})</p>
-      `;
+      const invDiv = document.getElementById('invContent');
+      let html = `<p>💰 Moedas: ${S.coins} | 📦 Sucata na mão: ${S.scrap}</p>`;
+      html += `<div class="inv-item-row"><span>🍞 Rações</span> <span>${S.inventory.food}</span> ${S.inventory.food>0 && S.currentScreen==='surface' ? '<button class="inv-use-btn" id="useFoodBtn">Usar</button>' : ''}</div>`;
+      html += `<div class="inv-item-row"><span>💊 Kits Médicos</span> <span>${S.inventory.medkit}</span> ${S.inventory.medkit>0 && S.currentScreen==='surface' ? '<button class="inv-use-btn" id="useMedkitBtn">Usar</button>' : ''}</div>`;
+      html += `<div class="inv-item-row"><span>📡 Sensores</span> <span>${S.inventory.sensor}</span></div>`;
+      html += `<div class="inv-item-row"><span>💣 Granadas</span> <span>${S.inventory.grenade}</span></div>`;
+      html += `<div class="inv-item-row"><span>🌱 Sementes</span> <span>${S.inventory.seeds}</span></div>`;
+      html += `<p style="margin-top:12px;">🛡️ Traje nível ${S.suitLvl} (Turnos ${10+S.suitLvl*2})</p>`;
+      invDiv.innerHTML = html;
+
+      // Botões de uso dentro do inventário (superfície)
+      if(S.currentScreen==='surface') {
+        const useFood = document.getElementById('useFoodBtn');
+        const useMedkit = document.getElementById('useMedkitBtn');
+        if(useFood) useFood.onclick = ()=>{
+          if(S.inventory.food>0) {
+            S.inventory.food--;
+            S.hunger = Math.max(0, S.hunger-40);
+            S.energy = Math.min(S.maxEnergy, S.energy+20);
+            addLog('🍞 Ração usada do inventário.','success');
+            openInventory(); // refresh
+            document.getElementById('surfaceStats').innerHTML = surfaceStatsHTML();
+          }
+        };
+        if(useMedkit) useMedkit.onclick = ()=>{
+          if(S.inventory.medkit>0 && S.hp<S.maxHp) {
+            S.inventory.medkit--;
+            S.hp = Math.min(S.maxHp, S.hp+25);
+            addLog('💊 Kit médico usado. +25 Vida.','success');
+            openInventory();
+            document.getElementById('surfaceStats').innerHTML = surfaceStatsHTML();
+          }
+        };
+      }
+
       showScreen('inventory','inventory');
     }
 
-    // EVENTOS INICIAIS
     document.getElementById('startGameBtn').addEventListener('click', ()=>{
-      initAudio();
       S.name = document.getElementById('nameInput').value.trim() || 'Ascensor';
-      S.hp=100; S.energy=100; S.hunger=0; S.vegetation=0; S.coins=25; S.suitLvl=0; S.maxTurns=10;
+      S.hp=100; S.energy=100; S.hunger=0; S.vegetation=0; S.coins=0; S.suitLvl=0; S.maxTurns=10;
+      S.inventory = { food:3, medkit:1, sensor:0, grenade:0, seeds:0 };
       updateVegUI();
       document.getElementById('bunkerInfo').innerHTML = `Bem-vindo, <strong>${S.name}</strong>.`;
       renderBunkerShop();
       showScreen('bunker','bunker');
     });
     document.getElementById('goSurfaceBtn').addEventListener('click', ()=>{
-      clearLog(); S.scrap=0; S.turn=1; S.ongoingEvent=null;
+      clearLog(); S.scrap=0; S.turn=1;
       document.getElementById('surfaceStats').innerHTML = surfaceStatsHTML();
       showScreen('surface','surface');
       addLog('Superfície. Ar pesado.');
@@ -597,7 +592,12 @@
     });
     document.getElementById('openInventoryBtn').addEventListener('click', openInventory);
     document.getElementById('closeInvBtn').addEventListener('click', ()=>{
-      showScreen(S.previousScreen || 'bunker', S.previousScreen==='surface'?'surface':'bunker');
+      if(S.previousScreen==='surface') {
+        showScreen('surface','surface');
+        document.getElementById('surfaceStats').innerHTML = surfaceStatsHTML();
+      } else {
+        showScreen('bunker','bunker');
+      }
     });
   })();
 </script>
