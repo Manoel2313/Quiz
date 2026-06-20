@@ -1,783 +1,605 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projeto O₂: Ascensão</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-void: #0a0a0f;
-            --emerald: #00f0a8;
-            --emerald-glow: #00f0a866;
-            --crimson: #ff3d5c;
-            --crimson-glow: #ff3d5c66;
-            --gold: #ffb347;
-            --gold-glow: #ffb34755;
-            --ocean: #00c6ff;
-            --ocean-glow: #00c6ff55;
-            --surface: rgba(255,255,255,0.03);
-            --surface-hover: rgba(255,255,255,0.07);
-            --border-subtle: rgba(255,255,255,0.08);
-            --border-glow: rgba(255,255,255,0.2);
-            --text-primary: #f0ece4;
-            --text-secondary: #b0aaa0;
-            --radius-sm: 12px;
-            --radius-lg: 24px;
-            --radius-xl: 32px;
-            --font-display: 'Cinzel', Georgia, serif;
-            --font-body: 'Inter', system-ui, sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            --ease-out-expo: cubic-bezier(0.19,1,0.22,1);
-            --ease-spring: cubic-bezier(0.34,1.56,0.64,1);
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: var(--font-body);
-            background: var(--bg-void);
-            color: var(--text-primary);
-            line-height: 1.6;
-            font-size: 16px;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow-x: hidden;
-            position: relative;
-            transition: background 0.5s;
-        }
-        #particlesCanvas {
-            position: fixed;
-            top:0; left:0;
-            width:100%; height:100%;
-            z-index:0;
-            pointer-events: none;
-            opacity:0.7;
-        }
-        #game-container {
-            width: 100%;
-            max-width: 800px;
-            margin: 20px;
-            background: rgba(15,15,20,0.8);
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-xl);
-            padding: 40px 32px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(0,240,168,0.05);
-            z-index: 2;
-            position: relative;
-            transition: background 0.5s, border-color 0.5s, box-shadow 0.5s;
-        }
-        /* Temas visuais para cada tela */
-        #game-container.bunker-theme {
-            background: rgba(30, 25, 15, 0.85);
-            border-color: rgba(255, 179, 71, 0.3);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 50px rgba(255, 179, 71, 0.15);
-        }
-        #game-container.expedition-theme {
-            background: rgba(35, 25, 20, 0.85);
-            border-color: rgba(139, 90, 43, 0.4);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(139, 90, 43, 0.2);
-        }
-        #game-container.combat-theme {
-            background: rgba(40, 10, 10, 0.9);
-            border-color: rgba(255, 61, 92, 0.6);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 80px rgba(255, 61, 92, 0.4);
-            animation: panicPulse 0.8s infinite alternate;
-        }
-        @keyframes panicPulse {
-            from { box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 80px rgba(255, 61, 92, 0.4); }
-            to { box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 120px rgba(255, 61, 92, 0.7); background: rgba(50, 5, 5, 0.9); }
-        }
-        #game-container.inventory-theme {
-            background: rgba(10, 20, 30, 0.85);
-            border-color: rgba(0, 198, 255, 0.3);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 50px rgba(0, 198, 255, 0.15);
-        }
-        #game-container.victory-theme {
-            background: rgba(10, 30, 20, 0.85);
-            border-color: rgba(0, 240, 168, 0.4);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 60px rgba(0, 240, 168, 0.25);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Projeto O₂: Ascensão · Edição Imersiva</title>
+  <style>
+    :root {
+      --bg: #0b0e0c;
+      --gold: #e6b34a;
+      --gold-glow: #e6b34a66;
+      --rust: #b45a3c;
+      --rust-glow: #b45a3c66;
+      --ember: #d94f3a;
+      --ember-glow: #d94f3a66;
+      --ocean: #60b5cc;
+      --ocean-glow: #60b5cc55;
+      --leaf: #6bbf6b;
+      --leaf-glow: #6bbf6b66;
+      --panel: rgba(18, 22, 18, 0.8);
+      --panel-light: rgba(28, 32, 26, 0.75);
+      --border: rgba(220, 200, 140, 0.15);
+      --border-active: rgba(230, 180, 70, 0.5);
+      --text: #e0dac8;
+      --text-dim: #a8a290;
+      --font-main: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius: 18px;
+      --ease-spring: cubic-bezier(0.4, 1.6, 0.5, 1);
+      --ease-smooth: cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: var(--font-main);
+      background: #080b09;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      margin: 0;
+      background-image: radial-gradient(circle at 20% 30%, rgba(60, 40, 30, 0.25), transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(20, 40, 35, 0.25), transparent 50%);
+    }
+    #game-container {
+      width: 100%;
+      max-width: 780px;
+      background: rgba(18, 22, 18, 0.7);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      padding: 2rem 2rem 1.8rem;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 30px rgba(100, 80, 40, 0.15);
+      position: relative;
+      transition: all 0.4s var(--ease-smooth);
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+    /* temas por tela */
+    .theme-bunker {
+      border-color: rgba(230, 180, 70, 0.4);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 40px rgba(230, 180, 70, 0.2);
+      background: rgba(24, 22, 14, 0.75);
+    }
+    .theme-surface {
+      border-color: rgba(180, 90, 50, 0.45);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 35px rgba(160, 80, 40, 0.25);
+      background: rgba(28, 22, 18, 0.75);
+    }
+    .theme-combat {
+      border-color: rgba(220, 60, 50, 0.7);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 60px rgba(220, 60, 50, 0.45);
+      background: rgba(35, 12, 10, 0.85);
+      animation: panicPulse 0.7s infinite alternate;
+    }
+    @keyframes panicPulse {
+      from { box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 60px rgba(220, 60, 50, 0.45); background: rgba(35, 12, 10, 0.85); }
+      to { box-shadow: 0 25px 50px rgba(0,0,0,0.9), 0 0 85px rgba(240, 70, 50, 0.7); background: rgba(48, 8, 5, 0.9); }
+    }
+    .theme-inventory {
+      border-color: rgba(96, 180, 200, 0.4);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 35px rgba(96, 180, 200, 0.2);
+      background: rgba(14, 22, 26, 0.8);
+    }
+    .hidden { display:none !important; }
 
-        .hidden { display:none !important; }
-        h1,h2,h3 {
-            font-family: var(--font-display);
-            font-weight:700;
-            letter-spacing:1px;
-        }
-        h1 {
-            font-size:2.5rem;
-            background: linear-gradient(135deg, var(--emerald), var(--ocean));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom:16px;
-        }
-        h2 { font-size:1.8rem; color:#fff; margin-bottom:16px; }
-        .accent {
-            background: linear-gradient(135deg, var(--emerald), var(--ocean));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .status-bar {
-            display:flex; gap:16px; margin:16px 0; flex-wrap:wrap;
-        }
-        .status-item {
-            flex:1; min-width:100px;
-            background:var(--surface);
-            border:1px solid var(--border-subtle);
-            border-radius:var(--radius-sm);
-            padding:10px 12px;
-            text-align:center;
-        }
-        .status-label {
-            font-size:0.75rem;
-            text-transform:uppercase;
-            letter-spacing:2px;
-            color:var(--text-secondary);
-        }
-        .status-value {
-            font-size:1.8rem;
-            font-weight:700;
-            font-family: var(--font-mono);
-        }
-        .hp { color:#ff3d5c; text-shadow:0 0 10px var(--crimson-glow); }
-        .ep { color:#ffb347; text-shadow:0 0 10px var(--gold-glow); }
-        .hunger { color:#ff8c42; text-shadow:0 0 10px rgba(255,140,66,0.5); }
-        .progress-bar {
-            height:8px; background:rgba(255,255,255,0.1);
-            border-radius:10px; margin:10px 0 24px; overflow:hidden;
-        }
-        .progress-fill {
-            height:100%;
-            background: linear-gradient(90deg, var(--emerald), var(--ocean));
-            border-radius:10px;
-            width:0%;
-            transition: width 0.8s var(--ease-out-expo);
-            box-shadow:0 0 20px var(--emerald-glow);
-        }
-        .choices {
-            display:flex; flex-direction:column; gap:12px; margin:24px 0;
-        }
-        .choice-btn {
-            background: var(--surface);
-            border:1px solid var(--border-subtle);
-            border-radius:var(--radius-sm);
-            padding:14px 20px;
-            color:var(--text-primary);
-            font-family:var(--font-body);
-            font-size:1rem;
-            font-weight:500;
-            cursor:pointer;
-            transition: all 0.3s var(--ease-spring);
-            text-align:left;
-            position:relative;
-            overflow:hidden;
-        }
-        .choice-btn:hover {
-            background:var(--surface-hover);
-            border-color:var(--border-glow);
-            transform:translateX(6px);
-            box-shadow:0 0 20px rgba(0,240,168,0.1);
-        }
-        .choice-btn:active { transform:scale(0.98); }
-        .choice-btn.disabled { opacity:0.4; pointer-events:none; }
-        .btn-special {
-            background: linear-gradient(135deg, rgba(0,240,168,0.1), rgba(0,198,255,0.05));
-            border-color: rgba(0,240,168,0.3);
-            font-weight:600;
-        }
-        .log-area {
-            background:rgba(0,0,0,0.4);
-            border:1px solid var(--border-subtle);
-            border-radius:var(--radius-sm);
-            padding:16px;
-            margin:20px 0;
-            max-height:200px;
-            overflow-y:auto;
-            font-family:var(--font-mono);
-            font-size:0.85rem;
-            color:#b0b0b0;
-            line-height:1.5;
-        }
-        .log-entry { margin-bottom:6px; }
-        .log-entry.danger { color:#ff6b7f; }
-        .log-entry.success { color:#00f0a8; }
-        .log-entry.info { color:#00c6ff; }
-        .inventory-grid {
-            display:grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px,1fr));
-            gap:10px;
-            margin:16px 0;
-        }
-        .inv-item {
-            background:var(--surface);
-            border:1px solid var(--border-subtle);
-            border-radius:var(--radius-sm);
-            padding:12px;
-            text-align:center;
-            font-size:0.9rem;
-        }
-        .inv-item .item-name { font-weight:600; color:#fff; display:block; margin-bottom:4px; }
-        .inv-item .item-qty { color:var(--gold); font-size:1.2rem; font-weight:700; }
-        input[type="text"] {
-            background:var(--surface);
-            border:1px solid var(--border-glow);
-            border-radius:var(--radius-sm);
-            padding:12px 16px;
-            color:#fff;
-            font-family:var(--font-body);
-            font-size:1rem;
-            width:100%;
-            margin:12px 0;
-            outline:none;
-            transition:0.3s;
-        }
-        input[type="text"]:focus {
-            border-color:var(--emerald);
-            box-shadow:0 0 20px var(--emerald-glow);
-        }
-        .btn-inventory {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-subtle);
-            border-radius: 20px;
-            padding: 8px 16px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: 0.3s;
-            z-index: 5;
-        }
-        .btn-inventory:hover {
-            background: var(--surface-hover);
-            color: #fff;
-        }
-        @media (max-width:600px) {
-            #game-container { padding:24px 16px; margin:10px; }
-            h1 { font-size:1.8rem; }
-            .status-value { font-size:1.5rem; }
-            .btn-inventory { top: 10px; right: 10px; }
-        }
-    </style>
+    h1, h2 {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    h2 {
+      font-size: 1.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .status-row {
+      display: flex;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+    }
+    .stat {
+      flex:1; min-width:80px;
+      background: rgba(10,10,10,0.5);
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 0.7rem 0.5rem;
+      text-align: center;
+      backdrop-filter: blur(12px);
+    }
+    .stat-label {
+      font-size:0.7rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-dim);
+    }
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.8rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .bar-horizontal {
+      height: 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      margin: 6px 0 16px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #e6b34a, #c49a3c);
+      border-radius: 10px;
+      box-shadow: 0 0 12px var(--gold-glow);
+      transition: width 0.6s var(--ease-smooth);
+    }
+    .log-panel {
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 1rem;
+      height: 160px;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #c0b890;
+      line-height: 1.5;
+      backdrop-filter: blur(8px);
+    }
+    .choices-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .choice-btn {
+      background: rgba(20,20,18,0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,200,0.08);
+      border-radius: 20px;
+      padding: 0.9rem 1.2rem;
+      color: #ddd;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.25s var(--ease-spring);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .choice-btn:hover {
+      background: rgba(40,38,30,0.8);
+      border-color: var(--border-active);
+      transform: translateX(6px);
+      box-shadow: 0 0 18px rgba(200,160,60,0.2);
+    }
+    .choice-btn:active { transform:scale(0.97); }
+    .btn-special {
+      background: linear-gradient(135deg, rgba(230,180,70,0.12), rgba(180,90,50,0.08));
+      border-color: rgba(230,180,70,0.35);
+    }
+    .btn-disabled { opacity:0.4; pointer-events:none; }
+
+    .mute-btn {
+      position: absolute;
+      top: 20px;
+      right: 70px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #aaa;
+      z-index: 10;
+    }
+    .inv-btn {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 6px 16px;
+      color: #ccc;
+      font-size: 0.85rem;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .character-mood {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    @media (max-width:600px) {
+      #game-container { padding:1.5rem; }
+      h2 { font-size:1.4rem; }
+    }
+  </style>
 </head>
 <body>
-    <canvas id="particlesCanvas"></canvas>
-    <div id="game-container">
-        <!-- TELA INICIAL -->
-        <div id="screen-start">
-            <h1>Projeto <span class="accent">O₂</span>: Ascensão</h1>
-            <p style="color:#b0aaa0;margin-bottom:24px;">Ano 2326. A superfície é um deserto tóxico. Você é um Ascensor. Sua missão: coletar recursos para ativar a Máquina de Restauração.</p>
-            <label style="color:#fff;">Seu nome, Ascensor:</label>
-            <input type="text" id="playerNameInput" placeholder="Digite seu nome..." maxlength="20">
-            <button class="choice-btn btn-special" id="btnStartGame" style="margin-top:12px;width:100%;text-align:center;">Iniciar Expedição</button>
-        </div>
+<div id="game-container">
+  <button class="mute-btn" id="muteToggle" title="Som">🔊</button>
+  <button class="inv-btn" id="openInventoryBtn">🎒 Inventário</button>
 
-        <!-- BUNKER -->
-        <div id="screen-bunker" class="hidden">
-            <button class="btn-inventory" id="btnInvBunker">🎒 Inventário</button>
-            <h2>🏠 Bunker dos Sobreviventes</h2>
-            <div id="bunkerStatus"></div>
-            <div class="progress-bar"><div class="progress-fill" id="vegetationFill"></div></div>
-            <p style="font-size:0.9rem;">🌱 Vegetação do Bunker: <span id="vegPercent">0%</span></p>
-            <div class="choices" id="bunkerActions"></div>
-            <button class="choice-btn btn-special" id="btnStartExpedition" style="width:100%;text-align:center;">🌍 Sair para a Superfície</button>
-        </div>
+  <!-- TELA INÍCIO -->
+  <div id="screen-start">
+    <h2>🌱 Projeto O₂: Ascensão</h2>
+    <p style="color:var(--text-dim); margin-bottom:1rem;">Ano 2326. Superfície devastada. Você é um Ascensor.</p>
+    <input type="text" id="nameInput" placeholder="Seu nome..." maxlength="20" style="width:100%; padding:12px; border-radius:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); color:white; margin-bottom:1rem;">
+    <button class="choice-btn btn-special" id="startGameBtn" style="width:100%; justify-content:center;">Iniciar Jornada</button>
+  </div>
 
-        <!-- EXPEDIÇÃO -->
-        <div id="screen-expedition" class="hidden">
-            <button class="btn-inventory" id="btnInvExpedition">🎒 Inventário</button>
-            <h2>🌫️ Superfície Tóxica</h2>
-            <div class="status-bar">
-                <div class="status-item"><div class="status-label">❤️ Vida</div><div class="status-value hp" id="hpDisplay">100</div></div>
-                <div class="status-item"><div class="status-label">⚡ Energia</div><div class="status-value ep" id="epDisplay">100</div></div>
-                <div class="status-item"><div class="status-label">🍖 Fome</div><div class="status-value hunger" id="hungerDisplay">0</div></div>
-                <div class="status-item"><div class="status-label">🕒 Turno</div><div class="status-value" id="turnDisplay" style="color:#fff;">1/10</div></div>
-                <div class="status-item"><div class="status-label">💰 Sucata</div><div class="status-value" id="scrapDisplay" style="color:#ffb347;">0</div></div>
-            </div>
-            <div class="log-area" id="expeditionLog"></div>
-            <div class="choices" id="expeditionChoices"></div>
-        </div>
+  <!-- BUNKER -->
+  <div id="screen-bunker" class="hidden">
+    <h2>🏠 Bunker</h2>
+    <div id="bunkerInfo"></div>
+    <div class="bar-horizontal"><div class="bar-fill" id="vegBar"></div></div>
+    <p style="font-size:0.9rem;">🌿 Vegetação: <span id="vegPercent">0%</span></p>
+    <div class="choices-grid" id="bunkerActions"></div>
+    <button class="choice-btn btn-special" id="goSurfaceBtn" style="width:100%; justify-content:center;">🌍 Ir para a Superfície</button>
+  </div>
 
-        <!-- COMBATE -->
-        <div id="screen-combat" class="hidden">
-            <h2>⚔️ Confronto com Mutante!</h2>
-            <div class="status-bar">
-                <div class="status-item"><div class="status-label">❤️ Sua Vida</div><div class="status-value hp" id="combatHp">100</div></div>
-                <div class="status-item"><div class="status-label">👾 Mutante</div><div class="status-value" style="color:#ff3d5c;" id="mutantHp">?</div></div>
-            </div>
-            <p id="combatDesc" style="color:#b0aaa0;"></p>
-            <div class="choices" id="combatChoices"></div>
-        </div>
+  <!-- SUPERFÍCIE -->
+  <div id="screen-surface" class="hidden">
+    <div class="character-mood" id="moodText"></div>
+    <h2>🌫️ Superfície Tóxica</h2>
+    <div class="status-row" id="surfaceStats"></div>
+    <div class="log-panel" id="surfaceLog"></div>
+    <div class="choices-grid" id="surfaceChoices"></div>
+  </div>
 
-        <!-- INVENTÁRIO -->
-        <div id="screen-inventory" class="hidden">
-            <h2 style="color:#00c6ff;">🎒 Inventário do Ascensor</h2>
-            <div id="inventoryContent"></div>
-            <button class="choice-btn" id="btnBackFromInventory" style="width:100%;text-align:center;margin-top:20px;">Voltar</button>
-        </div>
+  <!-- COMBATE -->
+  <div id="screen-combat" class="hidden">
+    <h2>⚔️ Confronto</h2>
+    <div class="status-row" id="combatStats"></div>
+    <p id="combatDesc" style="color:#e0b0a0;"></p>
+    <div class="choices-grid" id="combatChoices"></div>
+  </div>
 
-        <!-- VITÓRIA -->
-        <div id="screen-victory" class="hidden">
-            <h2>🌍 Vitória! A Terra Respira Novamente</h2>
-            <p style="font-size:1.2rem;margin:20px 0;">A Máquina de Restauração foi ativada. O carbono foi absorvido, o oxigênio retornou. As mutações foram neutralizadas e a humanidade pode, enfim, reconstruir a superfície. <span class="accent">Você salvou o mundo, Ascensor.</span></p>
-            <button class="choice-btn btn-special" onclick="location.reload()" style="width:100%;text-align:center;">Jogar novamente</button>
-        </div>
-    </div>
+  <!-- INVENTÁRIO -->
+  <div id="screen-inventory" class="hidden">
+    <h2 style="color:#9ad0e0;">🎒 Equipamento</h2>
+    <div id="invContent"></div>
+    <button class="choice-btn" id="closeInvBtn" style="width:100%; justify-content:center;">Fechar</button>
+  </div>
+</div>
 
-    <script>
-        // ============ PARTÍCULAS ============
-        const canvas = document.getElementById('particlesCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        const particleCount = 60;
-        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        resizeCanvas();
-        window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
-        class Particle {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height;
-                this.size = Math.random()*2.2+0.5;
-                this.speedX = (Math.random()-0.5)*0.35; this.speedY = (Math.random()-0.5)*0.35;
-                this.opacity = Math.random()*0.45+0.12;
-                this.opacitySpeed = (Math.random()-0.5)*0.005;
-                this.color = Math.random()<0.5 ? `rgba(0,240,168,${this.opacity})` : `rgba(0,198,255,${this.opacity})`;
-            }
-            update() {
-                this.x+=this.speedX; this.y+=this.speedY;
-                this.opacity+=this.opacitySpeed;
-                if(this.opacity<=0.06||this.opacity>=0.5) this.opacitySpeed*=-1;
-                this.color = this.color.replace(/[\d.]+\)$/, `${this.opacity})`);
-                if(this.x<-20) this.x=canvas.width+20; if(this.x>canvas.width+20) this.x=-20;
-                if(this.y<-20) this.y=canvas.height+20; if(this.y>canvas.height+20) this.y=-20;
-            }
-            draw() {
-                ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
-                ctx.fillStyle=this.color; ctx.shadowBlur=10; ctx.shadowColor=this.color;
-                ctx.fill(); ctx.shadowBlur=0;
-            }
+<script>
+  (function() {
+    // ÁUDIO PROCEDURAL
+    let audioCtx = null;
+    let mute = false;
+    function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    function playTone(freq, type='sine', duration=0.15, vol=0.08) {
+      if(mute || !audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type; osc.frequency.value = freq;
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + duration);
+    }
+    function ambientDrone() { /* poderia ser contínuo, simplificado */ }
+
+    document.getElementById('muteToggle').addEventListener('click', ()=>{
+      mute=!mute;
+      document.getElementById('muteToggle').textContent = mute ? '🔇' : '🔊';
+      if(!mute) initAudio();
+    });
+
+    // ESTADO
+    const S = {
+      name: '', hp:100, maxHp:100, energy:100, maxEnergy:100, hunger:0, maxHunger:100,
+      coins:25, scrap:0, turn:1, maxTurns:10, vegetation:0,
+      inventory: { food:3, medkit:1, sensor:0, grenade:0, seeds:0 },
+      suitLvl:0, mutantWounded:false, mutantHp:0, mutantType:null,
+      currentScreen:'start', previousScreen:null,
+      ongoingEvent:null, eventTimer:0,
+    };
+
+    const container = document.getElementById('game-container');
+    function setTheme(t) {
+      container.className = '';
+      if(t) container.classList.add('theme-'+t);
+    }
+    function showScreen(id, theme) {
+      ['start','bunker','surface','combat','inventory'].forEach(s=>document.getElementById('screen-'+s).classList.add('hidden'));
+      document.getElementById('screen-'+id).classList.remove('hidden');
+      S.currentScreen = id;
+      setTheme(theme||'');
+    }
+
+    // HELPERS
+    const vegBar = document.getElementById('vegBar');
+    const vegPercent = document.getElementById('vegPercent');
+    function updateVegUI() { vegBar.style.width = S.vegetation+'%'; vegPercent.textContent = S.vegetation+'%'; }
+
+    function surfaceStatsHTML() {
+      return `
+        <div class="stat"><div class="stat-label">❤️ Vida</div><div class="stat-value" style="color:#e05a4a;">${S.hp}/${S.maxHp}</div></div>
+        <div class="stat"><div class="stat-label">⚡ Energia</div><div class="stat-value" style="color:#e6b34a;">${S.energy}/${S.maxEnergy}</div></div>
+        <div class="stat"><div class="stat-label">🍖 Fome</div><div class="stat-value" style="color:#d9783c;">${S.hunger}/${S.maxHunger}</div></div>
+        <div class="stat"><div class="stat-label">🕒 Turno</div><div class="stat-value">${S.turn}/${S.maxTurns}</div></div>
+        <div class="stat"><div class="stat-label">💰 Sucata</div><div class="stat-value" style="color:#e6b34a;">${S.scrap}</div></div>
+      `;
+    }
+    function combatStatsHTML() {
+      return `
+        <div class="stat"><div class="stat-label">❤️ Você</div><div class="stat-value" style="color:#e05a4a;">${S.hp}</div></div>
+        <div class="stat"><div class="stat-label">👾 Mutante</div><div class="stat-value" style="color:#e05a4a;">${S.mutantHp}</div></div>
+      `;
+    }
+
+    const logDiv = document.getElementById('surfaceLog');
+    function addLog(msg, cls='') {
+      const d = document.createElement('div'); d.textContent = msg;
+      if(cls) d.style.color = cls==='danger'?'#e05a4a':cls==='success'?'#8bc78b':'#b0c0d0';
+      logDiv.appendChild(d); logDiv.scrollTop = logDiv.scrollHeight;
+    }
+    function clearLog() { logDiv.innerHTML = ''; }
+    function moodText() {
+      let mood = '';
+      if(S.hunger>70) mood = '☠️ Faminto e fraco.';
+      else if(S.hp<30) mood = '🩸 Ferido. Cada passo dói.';
+      else if(S.energy<25) mood = '💤 Exausto. Preciso descansar.';
+      else if(S.scrap>20) mood = '💰 Carregado! Hora de voltar?';
+      else mood = '🌫️ O ar pesa... mas sigo.';
+      document.getElementById('moodText').textContent = mood;
+    }
+
+    function checkGameOver() {
+      if(S.hp<=0) { S.hp=0; addLog('💀 Desmaio... resgatado.', 'danger'); loseExpedition(); return true; }
+      if(S.energy<=0) { S.energy=0; addLog('😵 Exaustão total.', 'danger'); loseExpedition(); return true; }
+      if(S.hunger>=S.maxHunger) { addLog('🤢 Desmaio de fome.', 'danger'); loseExpedition(); return true; }
+      return false;
+    }
+    function loseExpedition() {
+      S.scrap = 0; S.hp = Math.floor(S.maxHp*0.25); S.energy = Math.floor(S.maxEnergy*0.3);
+      S.hunger = Math.min(S.maxHunger, S.hunger+20);
+      returnToBunker();
+    }
+
+    function returnToBunker() {
+      S.coins += S.scrap; S.scrap = 0;
+      S.vegetation = Math.min(100, S.vegetation + 5);
+      if(S.inventory.seeds>0) { S.vegetation = Math.min(100, S.vegetation + S.inventory.seeds*2); S.inventory.seeds=0; }
+      updateVegUI();
+      document.getElementById('bunkerInfo').innerHTML = `🔋 Vida ${S.hp}/${S.maxHp} · ⚡ ${S.energy} · 🍖 ${S.hunger} · 💰 ${S.coins} moedas`;
+      renderBunkerShop();
+      showScreen('bunker','bunker');
+      if(S.vegetation>=100) victory();
+    }
+
+    function victory() {
+      showScreen('bunker','bunker');
+      document.getElementById('bunkerInfo').innerHTML = '<h2 style="color:#8bc78b;">🌍 VITÓRIA! A Terra respira novamente.</h2>';
+    }
+
+    function nextTurn() {
+      if(checkGameOver()) return;
+      S.turn++; S.hunger = Math.min(S.maxHunger, S.hunger+5);
+      if(S.ongoingEvent) advanceEvent();
+      if(S.turn > S.maxTurns) { addLog('⏳ Oxigênio esgotado. Retorno forçado.','danger'); S.hp-=5; returnToBunker(); return; }
+      moodText();
+      addLog(`Turno ${S.turn}/${S.maxTurns}`);
+      generateSurfaceChoices();
+    }
+
+    // EVENTOS ENCADEADOS
+    function startEvent(type) {
+      S.ongoingEvent = type; S.eventTimer = 0;
+    }
+    function advanceEvent() {
+      if(!S.ongoingEvent) return;
+      S.eventTimer++;
+      if(S.ongoingEvent==='storm') {
+        if(S.eventTimer===1) addLog('🌪️ O céu escurece... tempestade tóxica se aproxima.');
+        else if(S.eventTimer===2) {
+          addLog('☠️ Chuva ácida! Precisa de abrigo ou sofrerá dano.','danger');
+          // forçar escolha de abrigo na próxima rodada
         }
-        function initParticles() { particles=[]; for(let i=0;i<particleCount;i++) particles.push(new Particle()); }
-        initParticles();
-        function animateParticles() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            particles.forEach(p=>{ p.update(); p.draw(); });
-            for(let i=0;i<particles.length;i++){
-                for(let j=i+1;j<particles.length;j++){
-                    const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
-                    const dist=Math.sqrt(dx*dx+dy*dy);
-                    if(dist<130){
-                        ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y);
-                        ctx.strokeStyle=`rgba(255,255,255,${0.025*(1-dist/130)})`; ctx.lineWidth=0.4; ctx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
+      }
+    }
 
-        // ============ JOGO ============
-        const gameContainer = document.getElementById('game-container');
-        const screens = {
-            start: document.getElementById('screen-start'),
-            bunker: document.getElementById('screen-bunker'),
-            expedition: document.getElementById('screen-expedition'),
-            combat: document.getElementById('screen-combat'),
-            inventory: document.getElementById('screen-inventory'),
-            victory: document.getElementById('screen-victory')
+    const locations = [
+      { name:'Mercado Abandonado', desc:'Prateleiras vazias, lixo.', loot:[3,8], danger:0.3 },
+      { name:'Ruas Desertas', desc:'Asfalto rachado.', loot:[1,5], danger:0.15 },
+      { name:'Campo de Lixo', desc:'Montanhas de detritos.', loot:[5,15], danger:0.4 },
+      { name:'Esgoto', desc:'Úmido e escuro.', loot:[2,6], danger:0.25 },
+      { name:'Prédios Antigos', desc:'Concreto desabado.', loot:[4,10], danger:0.35 },
+      { name:'Metrô', desc:'Túneis silenciosos.', loot:[3,9], danger:0.3 }
+    ];
+
+    function generateSurfaceChoices() {
+      const choicesDiv = document.getElementById('surfaceChoices');
+      choicesDiv.innerHTML = '';
+      const pool = ['comer','dormir','descansar','sucata','irlocal'];
+      const shuffled = pool.sort(()=>Math.random()-0.5).slice(0,3);
+
+      shuffled.forEach(action=>{
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        switch(action) {
+          case 'comer':
+            if(S.inventory.food<=0) { btn.classList.add('btn-disabled'); btn.textContent='🍞 Sem rações'; }
+            else { btn.textContent='🍞 Comer ração (-fome, +energia)'; btn.onclick=()=>actionEat(); }
+            break;
+          case 'dormir':
+            btn.textContent='💤 Dormir (recupera energia, reduz fome)'; btn.onclick=()=>actionSleep();
+            break;
+          case 'descansar':
+            btn.textContent='🛌 Descansar (+energia)'; btn.onclick=()=>actionRest();
+            break;
+          case 'sucata':
+            btn.textContent='🔍 Procurar Sucatas'; btn.onclick=()=>actionSearch();
+            break;
+          case 'irlocal':
+            btn.textContent='🚶 Ir para local aleatório'; btn.onclick=()=>actionGoLocation();
+            break;
+        }
+        choicesDiv.appendChild(btn);
+      });
+      if(S.turn>=7) {
+        const retBtn = document.createElement('button');
+        retBtn.className='choice-btn btn-special';
+        retBtn.textContent='🏠 Voltar ao Bunker'; retBtn.onclick=()=>{ addLog('Retornando...'); returnToBunker(); };
+        choicesDiv.appendChild(retBtn);
+      }
+    }
+
+    function actionEat() {
+      if(S.inventory.food<=0) return;
+      S.inventory.food--; S.hunger = Math.max(0, S.hunger-40); S.energy = Math.min(S.maxEnergy, S.energy+20);
+      addLog('🍞 Ração consumida.','success'); playTone(600,'sine',0.12,0.06);
+      nextTurn();
+    }
+    function actionSleep() {
+      let rec = Math.floor(Math.random()*16)+30; S.energy = Math.min(S.maxEnergy, S.energy+rec); S.hunger = Math.max(0, S.hunger-15);
+      addLog(`💤 Dormiu. +${rec} energia.`); nextTurn();
+    }
+    function actionRest() {
+      let rec = Math.floor(Math.random()*11)+20; S.energy = Math.min(S.maxEnergy, S.energy+rec);
+      addLog(`🛌 Descansou. +${rec} energia.`); nextTurn();
+    }
+    function actionSearch() {
+      S.energy-=12; S.hunger+=8; addLog('🔍 Vasculhando...');
+      if(checkGameOver()) return;
+      if(Math.random()<0.4) { addLog('⚠️ Mutante!','danger'); startCombat('random'); return; }
+      let amount = Math.floor(Math.random()*5)+2; S.scrap+=amount;
+      addLog(`Encontrou ${amount} sucatas.`,'success'); playTone(800,'triangle',0.1,0.05);
+      nextTurn();
+    }
+    function actionGoLocation() {
+      S.energy-=8; S.hunger+=5;
+      if(checkGameOver()) return;
+      let loc = locations[Math.floor(Math.random()*locations.length)];
+      addLog(`📍 ${loc.name}: ${loc.desc}`);
+      if(Math.random()<loc.danger) { addLog('Mutante no local!','danger'); startCombat(loc.name); return; }
+      let amount = Math.floor(Math.random()*(loc.loot[1]-loc.loot[0]+1))+loc.loot[0];
+      S.scrap+=amount; addLog(`Coletou ${amount} sucatas.`); nextTurn();
+    }
+
+    // COMBATE
+    function startCombat(local) {
+      S.mutantWounded = false;
+      S.mutantHp = Math.floor(Math.random()*21)+30;
+      S.mutantType = Math.random()<0.5 ? 'Rastejante' : 'Bruto';
+      document.getElementById('combatDesc').textContent = `Um mutante ${S.mutantType} avança!`;
+      document.getElementById('combatStats').innerHTML = combatStatsHTML();
+      showScreen('combat','combat');
+      renderCombatChoices();
+      playTone(200,'sawtooth',0.2,0.1);
+    }
+    function renderCombatChoices() {
+      const div = document.getElementById('combatChoices'); div.innerHTML = '';
+      const atkBtn = document.createElement('button'); atkBtn.className='choice-btn';
+      atkBtn.textContent='⚔️ Atacar (10-25 dano)'; atkBtn.onclick=()=>combatAction('attack'); div.appendChild(atkBtn);
+      const defBtn = document.createElement('button'); defBtn.className='choice-btn';
+      defBtn.textContent='🛡️ Defender'; defBtn.onclick=()=>combatAction('defend'); div.appendChild(defBtn);
+      const fleeChance = S.mutantWounded ? 0.75 : 0.50;
+      const fleeBtn = document.createElement('button'); fleeBtn.className='choice-btn';
+      fleeBtn.textContent=`🏃 Fugir (${Math.round(fleeChance*100)}%)`; fleeBtn.onclick=()=>combatAction('flee'); div.appendChild(fleeBtn);
+      if(S.inventory.grenade>0) {
+        const grBtn = document.createElement('button'); grBtn.className='choice-btn btn-special';
+        grBtn.textContent='💣 Granada (fuga certa)'; grBtn.onclick=()=>{ S.inventory.grenade--; addLog('Granada!'); endCombat(true); };
+        div.appendChild(grBtn);
+      }
+    }
+    function combatAction(type) {
+      if(type==='attack') {
+        if(Math.random()<0.3) addLog('Errou!','danger');
+        else {
+          let dmg = Math.floor(Math.random()*16)+10; S.mutantHp-=dmg; S.mutantWounded=true;
+          addLog(`Acertou ${dmg} dano.`); if(S.mutantHp<=0) { addLog('Mutante abatido!'); S.scrap+=5; endCombat(true); return; }
+        }
+        let enemyDmg = Math.floor(Math.random()*11)+5; S.hp-=enemyDmg; addLog(`Mutante revida ${enemyDmg}.`,'danger');
+      } else if(type==='defend') {
+        let roll = Math.random(); let enemyDmg = Math.floor(Math.random()*11)+5;
+        if(roll<0.7) addLog('Defesa total!'); else if(roll<0.9) { let d=Math.floor(enemyDmg/2); S.hp-=d; addLog(`Defesa parcial -${d}.`); }
+        else { S.hp-=enemyDmg; addLog(`Falha -${enemyDmg}.`,'danger'); }
+      } else if(type==='flee') {
+        let chance = S.mutantWounded?0.75:0.50;
+        if(Math.random()<chance) { addLog('Fugiu!'); S.energy-=10; endCombat(true); return; }
+        else { let dmg=Math.floor(Math.random()*11)+5; S.hp-=dmg; addLog('Fuga falhou!','danger'); }
+      }
+      if(S.hp<=0) { S.hp=0; endCombat(false); return; }
+      document.getElementById('combatStats').innerHTML = combatStatsHTML();
+      renderCombatChoices();
+    }
+    function endCombat(survived) {
+      showScreen('surface','surface');
+      document.getElementById('surfaceStats').innerHTML = surfaceStatsHTML();
+      if(!survived) loseExpedition();
+      else { addLog('Confronto encerrado.'); nextTurn(); }
+    }
+
+    // BUNKER & LOJA
+    function renderBunkerShop() {
+      const div = document.getElementById('bunkerActions'); div.innerHTML = '';
+      const items = [
+        { name:'Ração', key:'food', cost:5 },
+        { name:'Kit Médico', key:'medkit', cost:10 },
+        { name:'Sensor', key:'sensor', cost:15 },
+        { name:'Granada', key:'grenade', cost:20 },
+        { name:'Sementes', key:'seeds', cost:30 },
+        { name:'Upgrade Traje', key:'suit', cost:50 },
+      ];
+      items.forEach(it=>{
+        const btn = document.createElement('button'); btn.className='choice-btn';
+        btn.textContent = `${it.name} (${it.cost}💰)`;
+        if(S.coins<it.cost) btn.classList.add('btn-disabled');
+        btn.onclick = ()=>{
+          if(S.coins>=it.cost) {
+            S.coins-=it.cost;
+            if(it.key==='suit') { S.suitLvl++; S.maxTurns = 10 + S.suitLvl*2; }
+            else S.inventory[it.key]++;
+            document.getElementById('bunkerInfo').innerHTML = `🔋 Vida ${S.hp}/${S.maxHp} · 💰 ${S.coins} moedas`;
+            renderBunkerShop();
+          }
         };
+        div.appendChild(btn);
+      });
+    }
 
-        // Remove todas as classes de tema e adiciona a correta
-        function setTheme(theme) {
-            gameContainer.classList.remove('bunker-theme', 'expedition-theme', 'combat-theme', 'inventory-theme', 'victory-theme');
-            if (theme) gameContainer.classList.add(theme);
-        }
+    // INVENTÁRIO
+    function openInventory() {
+      S.previousScreen = S.currentScreen;
+      document.getElementById('invContent').innerHTML = `
+        <p>💰 ${S.coins} moedas · 📦 Sucata na mão: ${S.scrap}</p>
+        <p>🍞 Rações: ${S.inventory.food} · 💊 Kits: ${S.inventory.medkit} · 📡 Sensores: ${S.inventory.sensor}</p>
+        <p>💣 Granadas: ${S.inventory.grenade} · 🌱 Sementes: ${S.inventory.seeds}</p>
+        <p>🛡️ Traje nível ${S.suitLvl} (Turnos ${10+S.suitLvl*2})</p>
+      `;
+      showScreen('inventory','inventory');
+    }
 
-        function showScreen(id, theme) {
-            Object.values(screens).forEach(s => s.classList.add('hidden'));
-            screens[id].classList.remove('hidden');
-            setTheme(theme || '');
-        }
-
-        const state = {
-            playerName: '',
-            hp:100, maxHp:100,
-            energy:100, maxEnergy:100,
-            hunger:0, maxHunger:100,
-            coins:20,
-            scrapThisRun:0,
-            turn:1, maxTurns:10,
-            vegetation:0,
-            inventory: { food:3, medkit:1, sensor:0, grenade:0, seeds:0 },
-            upgrades: { suit:0 },
-            mutantWounded:false,
-            mutantHp:0,
-            sensorActive:false,
-            previousScreen: null // para voltar do inventário
-        };
-
-        const vegFill = document.getElementById('vegetationFill');
-        const vegPercent = document.getElementById('vegPercent');
-        const bunkerStatus = document.getElementById('bunkerStatus');
-        const bunkerActions = document.getElementById('bunkerActions');
-        const expeditionLog = document.getElementById('expeditionLog');
-        const expeditionChoices = document.getElementById('expeditionChoices');
-        const combatChoices = document.getElementById('combatChoices');
-        const combatHp = document.getElementById('combatHp');
-        const mutantHp = document.getElementById('mutantHp');
-        const combatDesc = document.getElementById('combatDesc');
-
-        function updateUI() {
-            document.getElementById('hpDisplay').textContent = state.hp;
-            document.getElementById('epDisplay').textContent = state.energy;
-            document.getElementById('hungerDisplay').textContent = state.hunger;
-            document.getElementById('turnDisplay').textContent = state.turn+'/'+state.maxTurns;
-            document.getElementById('scrapDisplay').textContent = state.scrapThisRun;
-            vegFill.style.width = state.vegetation+'%';
-            vegPercent.textContent = state.vegetation+'%';
-        }
-
-        function addLog(msg, cls='') {
-            const d = document.createElement('div'); d.className='log-entry '+(cls||''); d.textContent=msg;
-            expeditionLog.appendChild(d); expeditionLog.scrollTop=expeditionLog.scrollHeight;
-        }
-        function clearLog() { expeditionLog.innerHTML=''; }
-
-        function checkDeath() {
-            if(state.hp<=0) {
-                state.hp=0; addLog('💀 Você desmaiou devido aos ferimentos...','danger');
-                addLog('Seus companheiros o resgatam. Sucatas perdidas.','danger');
-                state.scrapThisRun=0; state.hp=Math.floor(state.maxHp*0.3); state.energy=Math.floor(state.maxEnergy*0.4);
-                endExpedition(false); return true;
-            }
-            if(state.energy<=0) {
-                state.energy=0; addLog('😵 Você desmaiou de exaustão...','danger');
-                state.scrapThisRun=0; state.hp-=10; if(state.hp<0) state.hp=0;
-                state.energy=Math.floor(state.maxEnergy*0.3); endExpedition(false); return true;
-            }
-            if(state.hunger>=state.maxHunger) {
-                state.hunger=state.maxHunger; addLog('🤢 Fome extrema! Você desmaia e é resgatado.','danger');
-                state.scrapThisRun=0; state.hp-=15; if(state.hp<0) state.hp=0;
-                state.energy=Math.floor(state.maxEnergy*0.3); endExpedition(false); return true;
-            }
-            return false;
-        }
-
-        function startExpedition() {
-            clearLog(); state.scrapThisRun=0; state.turn=1; state.mutantWounded=false; state.sensorActive=false;
-            state.maxTurns = 10 + (state.upgrades.suit*2);
-            if(state.hp<=0) state.hp=1; if(state.energy<=0) state.energy=10;
-            updateUI(); showScreen('expedition', 'expedition-theme');
-            addLog('Você sai do bunker. O ar é irrespirável. Seu traje filtra oxigênio.','info');
-            addLog('Turno 1/'+state.maxTurns+' — Escolha sua ação:','info');
-            generateExpeditionChoices();
-        }
-
-        const allActions = ['comer','dormir','descansar','sucata','irlocal'];
-
-        function generateExpeditionChoices() {
-            expeditionChoices.innerHTML='';
-            const shuffled = [...allActions].sort(()=>Math.random()-0.5);
-            const chosen = shuffled.slice(0,3);
-
-            chosen.forEach(action=>{
-                const btn = document.createElement('button');
-                btn.className='choice-btn';
-                switch(action) {
-                    case 'comer':
-                        if(state.inventory.food<=0) { btn.classList.add('disabled'); btn.textContent='🍞 Comer (sem rações)'; }
-                        else { btn.textContent='🍞 Comer ração (-fome, +energia)'; btn.addEventListener('click',()=>actionEat()); }
-                        break;
-                    case 'dormir':
-                        btn.textContent='💤 Dormir (recupera energia e reduz fome)';
-                        btn.addEventListener('click',()=>actionSleep());
-                        break;
-                    case 'descansar':
-                        btn.textContent='🛌 Descansar (recupera energia)';
-                        btn.addEventListener('click',()=>actionRest());
-                        break;
-                    case 'sucata':
-                        btn.textContent='🔍 Procurar Sucatas (consome energia)';
-                        btn.addEventListener('click',()=>actionSearch());
-                        break;
-                    case 'irlocal':
-                        btn.textContent='🚶 Ir para... (local aleatório)';
-                        btn.addEventListener('click',()=>actionGoLocation());
-                        break;
-                }
-                expeditionChoices.appendChild(btn);
-            });
-
-            if(state.turn>=7) {
-                const btnRet = document.createElement('button');
-                btnRet.className='choice-btn btn-special';
-                btnRet.textContent='🏠 Voltar ao Bunker';
-                btnRet.addEventListener('click',()=>{ addLog('Você decide retornar ao bunker.','info'); endExpedition(true); });
-                expeditionChoices.appendChild(btnRet);
-            }
-        }
-
-        function actionEat() {
-            if(state.inventory.food<=0) return;
-            state.inventory.food--;
-            state.hunger = Math.max(0, state.hunger-40);
-            state.energy = Math.min(state.maxEnergy, state.energy+20);
-            addLog('Você come uma ração. Fome reduzida, +20 Energia.','success');
-            endTurn();
-        }
-        function actionSleep() {
-            const energyRec = Math.floor(Math.random()*16)+30;
-            state.energy = Math.min(state.maxEnergy, state.energy+energyRec);
-            state.hunger = Math.max(0, state.hunger-15);
-            addLog(`Você dorme. +${energyRec} Energia, fome reduzida.`,'success');
-            endTurn();
-        }
-        function actionRest() {
-            const energyRec = Math.floor(Math.random()*11)+20;
-            state.energy = Math.min(state.maxEnergy, state.energy+energyRec);
-            addLog(`Você descansa. +${energyRec} Energia.`,'success');
-            endTurn();
-        }
-        function actionSearch() {
-            state.energy-=12;
-            state.hunger+=8;
-            addLog('Você vasculha os escombros... (-12 Energia, +8 Fome)','info');
-            if(checkDeath()) return;
-            if(Math.random()<0.40 && !state.sensorActive) {
-                addLog('⚠️ Um mutante surge!','danger'); startCombat(); return;
-            }
-            if(state.sensorActive) {
-                state.sensorActive=false;
-                if(Math.random()<0.10) { addLog('⚠️ Mutante detectado pelo sensor!','danger'); startCombat(); return; }
-                addLog('Sensor indica área limpa. Nenhum mutante.','info');
-            }
-            const roll=Math.random(); let amount=0, type='';
-            if(roll<0.5){ amount=Math.floor(Math.random()*3)+1; type='comum'; }
-            else if(roll<0.8){ amount=Math.floor(Math.random()*4)+4; type='eletrônica'; }
-            else if(roll<0.95){ amount=Math.floor(Math.random()*7)+8; type='alta tecnologia'; }
-            else { amount=Math.floor(Math.random()*11)+20; type='artefato pré-colapso'; }
-            state.scrapThisRun+=amount;
-            addLog(`Encontrou ${amount} sucatas (${type}).`,'success');
-            endTurn();
-        }
-        function actionGoLocation() {
-            state.energy-=8;
-            state.hunger+=5;
-            addLog('Você se desloca para um local desconhecido... (-8 Energia, +5 Fome)','info');
-            if(checkDeath()) return;
-            const locations = [
-                { name:'Mercado Abandonado', desc:'Prateleiras vazias, lixo e possíveis latas esquecidas.', loot: [3,8], danger:0.3 },
-                { name:'Ruas Desertas', desc:'Asfalto rachado e carcaças de veículos.', loot:[1,5], danger:0.15 },
-                { name:'Campo de Lixo', desc:'Montanhas de detritos. Muito a catar, mas fedor insuportável.', loot:[5,15], danger:0.4 },
-                { name:'Esgoto', desc:'Úmido e escuro. Talvez itens tenham sido arrastados.', loot:[2,6], danger:0.25 },
-                { name:'Prédios Antigos', desc:'Ruínas de concreto. Escadas desabadas, mas tesouros podem estar intactos.', loot:[4,10], danger:0.35 },
-                { name:'Metrô', desc:'Túneis subterrâneos. O silêncio é perturbador.', loot:[3,9], danger:0.3 }
-            ];
-            const loc = locations[Math.floor(Math.random()*locations.length)];
-            addLog(`📍 ${loc.name}: ${loc.desc}`,'info');
-            const mutChance = state.sensorActive ? loc.danger*0.3 : loc.danger;
-            if(Math.random()<mutChance) {
-                addLog('⚠️ Um mutante apareceu neste local!','danger'); startCombat(); return;
-            }
-            if(state.sensorActive) state.sensorActive=false;
-            const amount = Math.floor(Math.random()*(loc.loot[1]-loc.loot[0]+1))+loc.loot[0];
-            state.scrapThisRun+=amount;
-            addLog(`Coletou ${amount} sucatas em ${loc.name}.`,'success');
-            endTurn();
-        }
-
-        function endTurn() {
-            if(checkDeath()) return;
-            state.turn++;
-            state.hunger += 5;
-            updateUI();
-            if(state.turn>state.maxTurns) {
-                addLog('⏳ Oxigênio esgotado. Retorno forçado ao bunker.','danger');
-                state.hp-=5; endExpedition(true); return;
-            }
-            addLog(`Turno ${state.turn}/${state.maxTurns} — Escolha:`, 'info');
-            generateExpeditionChoices();
-        }
-
-        function startCombat() {
-            state.mutantWounded=false;
-            state.mutantHp = Math.floor(Math.random()*21)+30;
-            showScreen('combat', 'combat-theme');
-            combatHp.textContent=state.hp; mutantHp.textContent=state.mutantHp;
-            combatDesc.textContent='Um mutante horrendo avança!';
-            renderCombatChoices();
-        }
-
-        function renderCombatChoices() {
-            combatChoices.innerHTML='';
-            const btnAtk = document.createElement('button'); btnAtk.className='choice-btn';
-            btnAtk.textContent='⚔️ Atacar (10-25 dano, 30% erro)';
-            btnAtk.addEventListener('click',()=>combatAction('attack')); combatChoices.appendChild(btnAtk);
-            const btnDef = document.createElement('button'); btnDef.className='choice-btn';
-            btnDef.textContent='🛡️ Defender (70% total, 20% metade, 10% falha)';
-            btnDef.addEventListener('click',()=>combatAction('defend')); combatChoices.appendChild(btnDef);
-            const fleeChance = state.mutantWounded ? 0.75 : 0.50;
-            const btnFlee = document.createElement('button'); btnFlee.className='choice-btn';
-            btnFlee.textContent=`🏃 Fugir (${Math.round(fleeChance*100)}% chance)`;
-            btnFlee.addEventListener('click',()=>combatAction('flee')); combatChoices.appendChild(btnFlee);
-            if(state.inventory.grenade>0) {
-                const btnGr = document.createElement('button'); btnGr.className='choice-btn btn-special';
-                btnGr.textContent='💣 Granada (fuga garantida)';
-                btnGr.addEventListener('click',()=>{
-                    state.inventory.grenade--; addLog('💥 Granada atordoa o mutante. Fuga garantida.','success'); endCombat(true);
-                }); combatChoices.appendChild(btnGr);
-            }
-        }
-
-        function combatAction(type) {
-            if(type==='attack') {
-                if(Math.random()<0.3) { addLog('Errou o ataque!','danger'); }
-                else {
-                    const dmg=Math.floor(Math.random()*16)+10; state.mutantHp-=dmg; state.mutantWounded=true;
-                    addLog(`Acertou causando ${dmg} de dano.`,'success');
-                    if(state.mutantHp<=0) { addLog('💀 Mutante derrotado! Coleta recursos.','success');
-                        state.scrapThisRun+=Math.floor(Math.random()*6)+3; endCombat(true); return; }
-                }
-                const enemyDmg=Math.floor(Math.random()*11)+5; state.hp-=enemyDmg;
-                addLog(`Mutante revida com ${enemyDmg} de dano.`,'danger');
-                checkDeath(); combatHp.textContent=state.hp; mutantHp.textContent=state.mutantHp;
-                if(state.hp<=0) { endCombat(false); return; }
-                renderCombatChoices();
-            } else if(type==='defend') {
-                const defRoll=Math.random(); const enemyDmg=Math.floor(Math.random()*11)+5; let taken=0;
-                if(defRoll<0.7) { addLog('🛡️ Defesa total!','success'); }
-                else if(defRoll<0.9) { taken=Math.floor(enemyDmg/2); state.hp-=taken; addLog(`Defesa parcial. -${taken} HP.`,'info'); }
-                else { taken=enemyDmg; state.hp-=taken; addLog(`Falha na defesa! -${taken} HP.`,'danger'); }
-                checkDeath(); combatHp.textContent=state.hp;
-                if(state.hp<=0) { endCombat(false); return; }
-                renderCombatChoices();
-            } else if(type==='flee') {
-                const chance = state.mutantWounded ? 0.75 : 0.50;
-                if(Math.random()<chance) { addLog('🏃 Fuga bem-sucedida!','success'); state.energy-=10; checkDeath(); endCombat(true); }
-                else {
-                    addLog('Fuga falhou!','danger'); const dmg=Math.floor(Math.random()*11)+5; state.hp-=dmg;
-                    addLog(`Sofreu ${dmg} de dano.`,'danger'); checkDeath(); combatHp.textContent=state.hp;
-                    if(state.hp<=0) { endCombat(false); return; } renderCombatChoices();
-                }
-            }
-        }
-
-        function endCombat(survived) {
-            showScreen('expedition', 'expedition-theme'); updateUI();
-            if(!survived || state.hp<=0) { endExpedition(false); }
-            else { addLog('Confronto encerrado.','info'); endTurn(); }
-        }
-
-        function endExpedition(voluntary) {
-            showScreen('bunker', 'bunker-theme');
-            const earned = state.scrapThisRun; state.coins+=earned;
-            state.vegetation = Math.min(100, state.vegetation+5);
-            if(state.inventory.seeds>0) {
-                const bonus=state.inventory.seeds*2; state.vegetation=Math.min(100, state.vegetation+bonus); state.inventory.seeds=0;
-            }
-            updateUI();
-            bunkerStatus.innerHTML = `<p>🔋 Vida: ${state.hp}/${state.maxHp} | ⚡ Energia: ${state.energy}/${state.maxEnergy} | 🍖 Fome: ${state.hunger}/${state.maxHunger} | 💰 Moedas: ${state.coins}</p><p>📦 Sucatas coletadas: ${earned} (convertidas em moedas)</p>`;
-            renderBunkerShop();
-            if(state.vegetation>=100) showScreen('victory', 'victory-theme');
-        }
-
-        function renderBunkerShop() {
-            bunkerActions.innerHTML='';
-            const items = [
-                { name:'Ração', key:'food', cost:5, desc:'-40 Fome, +20 Energia' },
-                { name:'Kit Médico Básico', key:'medkit', cost:10, desc:'+25 Vida' },
-                { name:'Kit Médico Avançado', key:'medkitAdv', cost:20, desc:'+50 Vida (uso único)' },
-                { name:'Sensor de Mutantes', key:'sensor', cost:15, desc:'Reduz perigo por 1 turno' },
-                { name:'Granada de Atordoamento', key:'grenade', cost:20, desc:'Fuga garantida' },
-                { name:'Sementes Especiais', key:'seeds', cost:30, desc:'+2% vegetação/dia' },
-                { name:'Upgrade de Traje', key:'suit', cost:50, desc:'+2 turnos superfície' },
-            ];
-            items.forEach(item=>{
-                const btn=document.createElement('button'); btn.className='choice-btn';
-                btn.textContent=`${item.name} (${item.cost} moedas) — ${item.desc}`;
-                btn.addEventListener('click',()=>buyItem(item));
-                if(state.coins<item.cost) btn.classList.add('disabled');
-                bunkerActions.appendChild(btn);
-            });
-            if(state.inventory.medkit>0 && state.hp<state.maxHp) {
-                const btnHeal=document.createElement('button'); btnHeal.className='choice-btn btn-special';
-                btnHeal.textContent=`💊 Usar Kit Médico (${state.inventory.medkit} disp.)`;
-                btnHeal.addEventListener('click',()=>{
-                    state.inventory.medkit--; state.hp=Math.min(state.maxHp, state.hp+25);
-                    updateUI(); bunkerStatus.innerHTML = `<p>🔋 Vida: ${state.hp}/${state.maxHp} | ⚡ Energia: ${state.energy}/${state.maxEnergy} | 🍖 Fome: ${state.hunger}/${state.maxHunger} | 💰 Moedas: ${state.coins}</p>`;
-                    renderBunkerShop();
-                }); bunkerActions.appendChild(btnHeal);
-            }
-        }
-
-        function buyItem(item) {
-            if(state.coins<item.cost) return;
-            state.coins-=item.cost;
-            if(item.key==='suit') { state.upgrades.suit++; addLogBunker('Traje melhorado! +2 turnos.'); }
-            else if(item.key==='medkitAdv') { state.hp=Math.min(state.maxHp, state.hp+50); addLogBunker('Kit avançado usado. +50 Vida.'); }
-            else { state.inventory[item.key]++; addLogBunker(`${item.name} comprado.`); }
-            updateUI(); bunkerStatus.innerHTML = `<p>🔋 Vida: ${state.hp}/${state.maxHp} | ⚡ Energia: ${state.energy}/${state.maxEnergy} | 🍖 Fome: ${state.hunger}/${state.maxHunger} | 💰 Moedas: ${state.coins}</p>`;
-            renderBunkerShop();
-        }
-        function addLogBunker(msg) { bunkerStatus.innerHTML += `<br><span style="color:#ffb347;">${msg}</span>`; }
-
-        // ============ INVENTÁRIO ============
-        function openInventory(returnScreen) {
-            state.previousScreen = returnScreen;
-            const invContent = document.getElementById('inventoryContent');
-            invContent.innerHTML = `
-            <div class="status-bar">
-              <div class="status-item"><div class="status-label">❤️ Vida</div><div class="status-value hp">${state.hp}/${state.maxHp}</div></div>
-              <div class="status-item"><div class="status-label">⚡ Energia</div><div class="status-value ep">${state.energy}/${state.maxEnergy}</div></div>
-              <div class="status-item"><div class="status-label">🍖 Fome</div><div class="status-value hunger">${state.hunger}/${state.maxHunger}</div></div>
-            </div>
-            <p style="margin:10px 0;">💰 Moedas: <strong>${state.coins}</strong> | 📦 Sucata na expedição: <strong>${state.scrapThisRun}</strong></p>
-            <h3 style="margin-top:16px;">Itens Carregados</h3>
-            <div class="inventory-grid">
-              <div class="inv-item"><span class="item-name">🍞 Rações</span><span class="item-qty">${state.inventory.food}</span></div>
-              <div class="inv-item"><span class="item-name">💊 Kits Médicos</span><span class="item-qty">${state.inventory.medkit}</span></div>
-              <div class="inv-item"><span class="item-name">📡 Sensores</span><span class="item-qty">${state.inventory.sensor}</span></div>
-              <div class="inv-item"><span class="item-name">💣 Granadas</span><span class="item-qty">${state.inventory.grenade}</span></div>
-              <div class="inv-item"><span class="item-name">🌱 Sementes</span><span class="item-qty">${state.inventory.seeds}</span></div>
-            </div>
-            <p style="margin-top:12px;">🛡️ Nível do Traje: <strong>${state.upgrades.suit}</strong> (Turnos máx: ${10+state.upgrades.suit*2})</p>
-            <p>🌱 Vegetação do Bunker: <strong>${state.vegetation}%</strong></p>
-          `;
-            showScreen('inventory', 'inventory-theme');
-        }
-
-        // Botões de inventário
-        document.getElementById('btnInvBunker').addEventListener('click', ()=> openInventory('bunker'));
-        document.getElementById('btnInvExpedition').addEventListener('click', ()=> openInventory('expedition'));
-        document.getElementById('btnBackFromInventory').addEventListener('click', ()=>{
-            if (state.previousScreen === 'bunker') {
-                showScreen('bunker', 'bunker-theme');
-                updateUI();
-                bunkerStatus.innerHTML = `<p>🔋 Vida: ${state.hp}/${state.maxHp} | ⚡ Energia: ${state.energy}/${state.maxEnergy} | 🍖 Fome: ${state.hunger}/${state.maxHunger} | 💰 Moedas: ${state.coins}</p>`;
-                renderBunkerShop();
-            } else {
-                showScreen('expedition', 'expedition-theme');
-                updateUI();
-            }
-        });
-
-        // Inicialização
-        document.getElementById('btnStartGame').addEventListener('click',()=>{
-            const name = document.getElementById('playerNameInput').value.trim() || 'Ascensor';
-            state.playerName=name; state.hp=100; state.energy=100; state.hunger=0;
-            state.coins=20; state.vegetation=0;
-            state.inventory={ food:3, medkit:1, sensor:0, grenade:0, seeds:0 };
-            state.upgrades={ suit:0 };
-            updateUI(); showScreen('bunker', 'bunker-theme');
-            bunkerStatus.innerHTML = `<p>Bem-vindo, <strong>${state.playerName}</strong>. Vegetação: 0%.</p><p>🔋 Vida: 100 | ⚡ Energia: 100 | 🍖 Fome: 0 | 💰 Moedas: 20</p>`;
-            renderBunkerShop();
-        });
-        document.getElementById('btnStartExpedition').addEventListener('click', startExpedition);
-    </script>
+    // EVENTOS INICIAIS
+    document.getElementById('startGameBtn').addEventListener('click', ()=>{
+      initAudio();
+      S.name = document.getElementById('nameInput').value.trim() || 'Ascensor';
+      S.hp=100; S.energy=100; S.hunger=0; S.vegetation=0; S.coins=25; S.suitLvl=0; S.maxTurns=10;
+      updateVegUI();
+      document.getElementById('bunkerInfo').innerHTML = `Bem-vindo, <strong>${S.name}</strong>.`;
+      renderBunkerShop();
+      showScreen('bunker','bunker');
+    });
+    document.getElementById('goSurfaceBtn').addEventListener('click', ()=>{
+      clearLog(); S.scrap=0; S.turn=1; S.ongoingEvent=null;
+      document.getElementById('surfaceStats').innerHTML = surfaceStatsHTML();
+      showScreen('surface','surface');
+      addLog('Superfície. Ar pesado.');
+      generateSurfaceChoices();
+    });
+    document.getElementById('openInventoryBtn').addEventListener('click', openInventory);
+    document.getElementById('closeInvBtn').addEventListener('click', ()=>{
+      showScreen(S.previousScreen || 'bunker', S.previousScreen==='surface'?'surface':'bunker');
+    });
+  })();
+</script>
 </body>
 </html>
