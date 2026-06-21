@@ -17,7 +17,7 @@
       padding: 20px;
     }
     #game {
-      max-width: 550px;
+      max-width: 600px;
       width: 100%;
       background: #1a1a1a;
       border: 2px solid #444;
@@ -41,41 +41,46 @@
     .bar-container {
       background: #222;
       border-radius: 4px;
-      height: 20px;
+      height: 18px;
       width: 100%;
-      margin: 5px 0;
+      margin: 4px 0;
       overflow: hidden;
     }
     .bar-fill {
       height: 100%;
       width: 100%;
-      background: #cc3333;
-      transition: width 0.2s;
+      transition: width 0.3s;
     }
     .bar-fill.green { background: #33aa33; }
+    .bar-fill.blue { background: #3377cc; }
+    .bar-fill.orange { background: #ff8800; }
     .log {
       background: #111;
       border: 1px solid #333;
       padding: 10px;
-      margin: 15px 0;
-      max-height: 200px;
+      margin: 12px 0;
+      max-height: 220px;
       overflow-y: auto;
       font-size: 0.9em;
       color: #aaa;
     }
     .log p { margin: 3px 0; }
     .highlight { color: #ff8800; font-weight: bold; }
-    .evolucao { color: #ffcc00; font-weight: bold; font-size: 1.2em; }
+    .evolucao { color: #ffcc00; font-weight: bold; font-size: 1.1em; }
+    .shinigami { color: #ff4444; font-weight: bold; }
+    .ally { color: #88aaff; }
     #start-screen, #game-screen, #combat-screen { display: none; }
     #game-screen.active, #start-screen.active, #combat-screen.active { display: block; }
     #player-stats, #enemy-stats { margin: 10px 0; }
+    #hunger-bar { margin-top: 5px; }
+    .status-text { font-size: 0.85em; margin: 2px 0; }
   </style>
 </head>
 <body>
 <div id="game">
   <div id="start-screen" class="active">
     <h2>🌑 Hueco Mundo</h2>
-    <p>Você é um Hollow faminto. Caçe, explore ruínas e devore para evoluir.</p>
+    <p>Você é um Hollow faminto. A areia branca se estende sob a lua eterna. Caçe, explore e devore para sobreviver.</p>
     <input type="text" id="name-input" placeholder="Nome do Hollow" maxlength="12">
     <button id="start-btn">Iniciar Caçada</button>
   </div>
@@ -83,7 +88,7 @@
   <div id="game-screen">
     <div id="player-stats"></div>
     <button id="hunt-btn">🔪 Caçar Hollow</button>
-    <button id="explore-btn">🔍 Explorar (20% chance carcaça)</button>
+    <button id="explore-btn">🔍 Explorar (incerto)</button>
     <div class="log" id="log"></div>
   </div>
 
@@ -93,6 +98,9 @@
     <hr>
     <div id="player-stats-combat"></div>
     <div id="combat-actions"></div>
+    <div id="ally-action" style="display:none; margin-top:8px;">
+      <button id="ally-attack-btn">🤝 Aliado ataca</button>
+    </div>
     <div class="log" id="combat-log"></div>
   </div>
 </div>
@@ -130,7 +138,7 @@
           { name: "Mordida", value: 50 },
           { name: "Arranhar", value: 50 },
           { name: "CERO", value: 100 },
-          { name: "Regeneração", value: 50 } // valor de cura
+          { name: "Regeneração", value: 50 }
         ]
       },
       "Vasto Lorde": {
@@ -138,11 +146,23 @@
         abilities: [
           { name: "Cortes", value: 150 },
           { name: "CERO", value: 300 },
-          { name: "Balas", value: 70, multi: true },   // 2-5 golpes de 70
+          { name: "Balas", value: 70, multi: true },
           { name: "Grand-Cero", value: 500 },
           { name: "Regeneração", value: 50 }
         ]
       }
+    };
+
+    // Shinigami especial
+    const SHINIGAMI = {
+      name: "Shinigami",
+      form: "Shinigami",
+      hp: 200,
+      abilities: [
+        { name: "Zanpakutō", value: 35 },
+        { name: "Hadō #31", value: 50 },
+        { name: "Bakudō #61", value: 20, stun: true }
+      ]
     };
 
     // -------------------- Classe Hollow --------------------
@@ -152,12 +172,13 @@
         this.form = form;
         this.xp = xp;
         this.isEnemy = isEnemy;
-        this.typeName = typeName; // nome temático (ex: "Prices")
-        const data = FORM_ABILITIES[form];
+        this.typeName = typeName;
+        const data = this.form === "Shinigami" ? SHINIGAMI : FORM_ABILITIES[form];
         this.maxHp = data.hp;
         this.hp = this.maxHp;
-        this.abilities = data.abilities.map(a => ({...a})); // cópia
+        this.abilities = data.abilities.map(a => ({...a}));
         this.xpNeeded = this.getXpNeeded();
+        this.stunned = false;
       }
 
       getXpNeeded() {
@@ -169,20 +190,21 @@
 
       isAlive() { return this.hp > 0; }
 
-      // Executa a habilidade escolhida contra o alvo, retorna {dmg, msg}
       useAbility(abilityName, target) {
+        if (this.stunned) {
+          this.stunned = false;
+          return { dmg: 0, msg: `${this.name} está atordoado e não pode agir!` };
+        }
         const ab = this.abilities.find(a => a.name === abilityName);
         if (!ab) return { dmg: 0, msg: "Habilidade inválida." };
         let dmg = 0;
         let msg = "";
         if (ab.name === "Regeneração") {
-          // Cura a si mesmo (não causa dano)
           const heal = ab.value;
           this.hp = Math.min(this.maxHp, this.hp + heal);
           return { dmg: 0, msg: `${this.name} usou Regeneração e recuperou ${heal} HP.` };
         } else if (ab.multi) {
-          // Balas: número aleatório de golpes (2-5)
-          const hits = Math.floor(Math.random() * 4) + 2; // 2 a 5
+          const hits = Math.floor(Math.random() * 4) + 2;
           dmg = ab.value * hits;
           msg = `${this.name} usou ${ab.name} (${hits} golpes) e causou ${dmg} de dano.`;
         } else {
@@ -190,13 +212,19 @@
           msg = `${this.name} usou ${ab.name} e causou ${dmg} de dano.`;
         }
         target.hp -= dmg;
+        // Efeito adicional de stun (Bakudō)
+        if (ab.stun) {
+          target.stunned = true;
+          msg += ` ${target.name} está atordoado!`;
+        }
         return { dmg, msg };
       }
 
       eat(prey) {
         const gain = prey.xp + Math.floor(Math.random() * 15) + 5;
         this.xp += gain;
-        const msg = `Você devorou ${prey.name} (${prey.typeName || prey.form}) e ganhou ${gain} de XP. (Total: ${this.xp}/${this.xpNeeded})`;
+        const msg = `Você devorou ${prey.name} e ganhou ${gain} de XP. (Total: ${this.xp}/${this.xpNeeded})`;
+        player.reduceHunger(60);
         this.checkEvolution();
         return msg;
       }
@@ -229,19 +257,18 @@
       else if (playerLevel === 1) form = Math.random() < 0.6 ? "Menos Grande" : "Adjucha";
       else if (playerLevel === 2) form = Math.random() < 0.7 ? "Adjucha" : "Vasto Lorde";
       else form = "Vasto Lorde";
-      // Escolhe um nome temático aleatório da lista correspondente
       const typeNames = HOLLOW_TYPES[form];
       const typeName = typeNames[Math.floor(Math.random() * typeNames.length)];
-      // Gera nome completo: Ex: "Prices (Hollow Comum)"
-      const displayName = typeName;
       const xp = Math.floor(Math.random() * 25) + 5;
-      const enemy = new Hollow(displayName, form, xp, true, typeName);
-      return enemy;
+      return new Hollow(typeName, form, xp, true, typeName);
     }
 
-    // -------------------- Estado do jogo --------------------
+    // -------------------- Variáveis do jogador --------------------
     let player = null;
+    let hunger = 0; // 0-100
+    let hasAlly = false; // aliado temporário
     let currentEnemy = null;
+
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
     const combatScreen = document.getElementById('combat-screen');
@@ -270,6 +297,38 @@
       screen.classList.add('active');
     }
 
+    function updateHungerBar() {
+      const container = document.getElementById('player-stats');
+      const bar = document.getElementById('hunger-bar');
+      if (!bar) {
+        container.innerHTML += `<div id="hunger-bar" class="status-text">Fome: ${hunger}/100 
+          <div class="bar-container"><div class="bar-fill orange" style="width:${hunger}%"></div></div></div>`;
+      } else {
+        bar.innerHTML = `Fome: ${hunger}/100 
+          <div class="bar-container"><div class="bar-fill orange" style="width:${hunger}%"></div></div>`;
+      }
+    }
+
+    function increaseHunger(amount) {
+      hunger = Math.min(100, hunger + amount);
+      if (hunger >= 100) {
+        const dmg = Math.floor(player.hp * 0.15);
+        player.hp -= dmg;
+        addLog(`⚠️ Sua fome é insuportável! Você perde ${dmg} HP.`);
+        hunger = 0;
+        if (!player.isAlive()) {
+          addLog("Você desmaiou de fome e foi devorado por outros Hollows...");
+          gameOver();
+        }
+      }
+      updateHungerBar();
+    }
+
+    window.reduceHunger = function(amount) {
+      hunger = Math.max(0, hunger - amount);
+      updateHungerBar();
+    };
+
     function updatePlayerStats(containerId = 'player-stats') {
       const container = document.getElementById(containerId);
       container.innerHTML = `
@@ -278,7 +337,9 @@
         <div class="bar-container"><div class="bar-fill green" style="width:${(player.hp/player.maxHp)*100}%"></div></div>
         XP: ${player.xp}/${player.xpNeeded}<br>
         Habilidades: ${player.abilities.map(a => a.name).join(', ')}
+        ${hasAlly ? '<span class="ally"> (Aliado presente)</span>' : ''}
       `;
+      updateHungerBar();
     }
 
     function updateEnemyStats() {
@@ -287,6 +348,7 @@
         <strong>${currentEnemy.name}</strong> [${currentEnemy.form}]<br>
         HP: ${currentEnemy.hp}/${currentEnemy.maxHp}
         <div class="bar-container"><div class="bar-fill" style="width:${(currentEnemy.hp/currentEnemy.maxHp)*100}%"></div></div>
+        ${currentEnemy.stunned ? '<span style="color:yellow;">(Atordoado)</span>' : ''}
       `;
     }
 
@@ -299,6 +361,33 @@
         btn.addEventListener('click', () => playerTurn(ab.name));
         actionsDiv.appendChild(btn);
       });
+      // Botão de aliado
+      const allyDiv = document.getElementById('ally-action');
+      const allyBtn = document.getElementById('ally-attack-btn');
+      if (hasAlly && currentEnemy && currentEnemy.isAlive()) {
+        allyDiv.style.display = 'block';
+        allyBtn.onclick = allyAttack;
+      } else {
+        allyDiv.style.display = 'none';
+      }
+    }
+
+    function allyAttack() {
+      if (!hasAlly || !currentEnemy || !currentEnemy.isAlive()) return;
+      const dmg = 20;
+      currentEnemy.hp -= dmg;
+      addLog(`🤝 Seu aliado ataca, causando ${dmg} de dano.`, 'ally');
+      updateEnemyStats();
+      // 50% de chance do aliado ir embora
+      if (Math.random() < 0.5) {
+        hasAlly = false;
+        addLog("O aliado Hollow fugiu após o ataque.", 'ally');
+        document.getElementById('ally-action').style.display = 'none';
+      }
+      if (!currentEnemy.isAlive()) {
+        addLog(`${currentEnemy.name} foi derrotado!`);
+        endCombat(true);
+      }
     }
 
     function startCombat(enemy) {
@@ -317,23 +406,17 @@
         if (player.form === "Vasto Lorde") {
           addLog("🌟 Você se tornou um Vasto Lorde! O ápice da existência Hollow. 🌟");
           alert("Parabéns! Você alcançou o topo da cadeia alimentar! Atualize a página para jogar novamente.");
-          document.getElementById('hunt-btn').disabled = true;
-          document.getElementById('explore-btn').disabled = true;
+          disableButtons();
         }
         showScreen(gameScreen);
         updatePlayerStats();
       } else {
-        addLog("☠️ Você foi destruído. Sua jornada termina aqui.");
-        alert("Game Over! Atualize a página para tentar novamente.");
-        document.getElementById('hunt-btn').disabled = true;
-        document.getElementById('explore-btn').disabled = true;
-        showScreen(gameScreen);
+        gameOver();
       }
     }
 
     function playerTurn(abilityName) {
       if (!currentEnemy || !player.isAlive()) return;
-      // Jogador ataca
       const result = player.useAbility(abilityName, currentEnemy);
       addLog(result.msg, 'highlight');
       updateEnemyStats();
@@ -345,7 +428,7 @@
         return;
       }
 
-      // Inimigo contra-ataca (escolhe habilidade aleatória)
+      // Turno do inimigo
       const enemyAb = currentEnemy.abilities[Math.floor(Math.random() * currentEnemy.abilities.length)];
       const enemyResult = currentEnemy.useAbility(enemyAb.name, player);
       addLog(enemyResult.msg);
@@ -356,27 +439,60 @@
         addLog("Você caiu em combate...");
         endCombat(false);
       }
+      // Atualiza botão aliado (pode ter morrido)
+      setupCombatActions();
     }
 
     function explore() {
-      if (Math.random() < 0.2) {
+      increaseHunger(25);
+      const roll = Math.random();
+      if (roll < 0.15) {
+        // 15% de chance de carcaça
         const xpGain = Math.floor(Math.random() * 20) + 10;
         const heal = Math.floor(player.maxHp * 0.25);
         player.xp += xpGain;
         player.hp = Math.min(player.maxHp, player.hp + heal);
-        addLog(`🔍 Você encontrou uma carcaça! Devorou os restos e ganhou ${xpGain} XP e curou ${heal} HP.`);
+        reduceHunger(50);
+        addLog("🔍 Você encontrou uma carcaça! Devorou os restos, ganhou " + xpGain + " XP e curou " + heal + " HP.");
         player.checkEvolution();
         updatePlayerStats();
+      } else if (roll < 0.25) {
+        // 10% de chance de evento especial
+        if (Math.random() < 0.6) {
+          // Hollow aliado
+          hasAlly = true;
+          addLog("🤝 Você encontrou um Hollow ferido. Ele se junta a você por um tempo.", 'ally');
+        } else {
+          // Shinigami!
+          addLog("⚡ Você sente uma pressão espiritual esmagadora! Um Shinigami aparece!", 'shinigami');
+          const shini = new Hollow("Shinigami", "Shinigami", 40, true, null);
+          startCombat(shini);
+          return; // combate inicia imediatamente
+        }
+        updatePlayerStats();
       } else {
-        addLog("🔍 Você explorou as areias brancas, mas não encontrou nada.");
+        addLog("🔍 Você vagou pela areia branca, mas não encontrou nada.");
       }
     }
 
     function hunt() {
+      increaseHunger(30);
       const levelMap = { "Hollow Comum": 0, "Menos Grande": 1, "Adjucha": 2, "Vasto Lorde": 3 };
       const level = levelMap[player.form];
       const enemy = generateEnemy(level);
       startCombat(enemy);
+    }
+
+    function gameOver() {
+      addLog("☠️ Você foi destruído. Sua jornada termina aqui.");
+      alert("Game Over! Atualize a página para tentar novamente.");
+      disableButtons();
+      showScreen(gameScreen);
+    }
+
+    function disableButtons() {
+      document.getElementById('hunt-btn').disabled = true;
+      document.getElementById('explore-btn').disabled = true;
     }
 
     // -------------------- Inicialização --------------------
@@ -387,11 +503,13 @@
         return;
       }
       player = new Hollow(name);
+      hunger = 0;
+      hasAlly = false;
       clearLogs();
       updatePlayerStats();
       document.getElementById('hunt-btn').disabled = false;
       document.getElementById('explore-btn').disabled = false;
-      addLog(`Bem-vindo, ${name}. Que comece a caçada.`);
+      addLog(`Bem-vindo, ${name}. A fome o consome.`);
       showScreen(gameScreen);
     });
 
