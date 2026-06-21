@@ -53,7 +53,6 @@
       transition: width 0.2s;
     }
     .bar-fill.green { background: #33aa33; }
-    .bar-fill.blue { background: #3377cc; }
     .log {
       background: #111;
       border: 1px solid #333;
@@ -74,7 +73,6 @@
 </head>
 <body>
 <div id="game">
-  <!-- Tela inicial -->
   <div id="start-screen" class="active">
     <h2>🌑 Hueco Mundo</h2>
     <p>Você é um Hollow faminto. Caçe, explore ruínas e devore para evoluir.</p>
@@ -82,7 +80,6 @@
     <button id="start-btn">Iniciar Caçada</button>
   </div>
 
-  <!-- Tela principal (overworld) -->
   <div id="game-screen">
     <div id="player-stats"></div>
     <button id="hunt-btn">🔪 Caçar Hollow</button>
@@ -90,7 +87,6 @@
     <div class="log" id="log"></div>
   </div>
 
-  <!-- Tela de combate -->
   <div id="combat-screen">
     <h3>⚔️ Combate</h3>
     <div id="enemy-stats"></div>
@@ -103,166 +99,104 @@
 
 <script>
   (function() {
-    // -------------------- Efeitos das habilidades temáticas --------------------
-    const ABILITY_EFFECTS = {
-      // Hollow Comum
-      "Prices": { dmgMult: 1.0, healPct: 0, bonusXp: 2 },      // ganha um pouco de XP extra ao acertar
-      "Claws": { dmgMult: 1.2, healPct: 0 },                   // dano aumentado
-      "Muscles": { dmgMult: 1.4, selfDmgPct: 0.05 },           // mais dano, mas se machuca levemente
-      "Beast": { dmgMult: 1.1, ignoreDef: 0.5 },               // ignora metade da defesa
-      // Menos Grande
-      "Jaw": { dmgMult: 1.5, healPct: 0 },
-      "Scratch": { dmgMult: 1.0, dotChance: 0.4, dotDmg: 3 },  // chance de causar sangramento (dano extra no turno seguinte)
-      "Nerves": { dmgMult: 0.8, stunChance: 0.5 },             // chance de atordoar (inimigo perde próximo ataque)
-      "Hungry": { dmgMult: 1.2, healFromDmg: 0.3 },            // cura 30% do dano causado
-      // Adjucha
-      "Language": { dmgMult: 1.3, ignoreDef: 0.7 },            // dano psíquico, ignora boa parte da defesa
-      "Fingers": { dmgMult: 0.9, hits: 2 },                    // dois golpes (cada um com 90% do dano base)
-      "Gluttony": { dmgMult: 1.1, healFromDmg: 0.5 },          // devora parte, cura metade do dano
-      "Eyes closed": { dmgMult: 0.6, buffDef: 4, buffTurns: 1 }, // reduz dano mas aumenta defesa temporariamente
-      // Vasto Lorde
-      "Vision kingdoms": { dmgMult: 2.0, healPct: 0.1 },       // dano massivo, pequena autocura
-      "Warlord": { dmgMult: 1.8, buffAtk: 5, buffTurns: 1 },   // dano alto e aumenta ataque no próximo turno
-      "Vomit": { dmgMult: 1.5, poisonChance: 0.6, poisonDmg: 5 }, // chance de envenenar
-      "Tyranny": { dmgMult: 2.5, selfDmgPct: 0.1 }             // dano extremo, mas perde 10% do HP atual
+    // -------------------- Tipos de Hollow (nomes temáticos) --------------------
+    const HOLLOW_TYPES = {
+      "Hollow Comum": ["Prices", "Claws", "Muscles", "Beast"],
+      "Menos Grande": ["Jaw", "Scratch", "Nerves", "Hungry"],
+      "Adjucha": ["Language", "Fingers", "Gluttony", "Eyes closed"],
+      "Vasto Lorde": ["Vision kingdoms", "Warlord", "Vomit", "Tyranny"]
     };
 
-    // -------------------- Configuração das formas --------------------
-    const FORMS = {
-      "Hollow Comum": { hp: 30, atk: 6, def: 2, xpNeeded: 20, abilities: ["Prices", "Claws", "Muscles", "Beast"] },
-      "Menos Grande": { hp: 60, atk: 12, def: 5, xpNeeded: 60, abilities: ["Jaw", "Scratch", "Nerves", "Hungry"] },
-      "Adjucha":      { hp: 40, atk: 18, def: 8, xpNeeded: 150, abilities: ["Language", "Fingers", "Gluttony", "Eyes closed"] },
-      "Vasto Lorde":  { hp: 70, atk: 28, def: 14, xpNeeded: Infinity, abilities: ["Vision kingdoms", "Warlord", "Vomit", "Tyranny"] }
+    // -------------------- Habilidades e danos fixos --------------------
+    const FORM_ABILITIES = {
+      "Hollow Comum": {
+        hp: 50,
+        abilities: [
+          { name: "Mordida", value: 10 },
+          { name: "Arranhar", value: 10 }
+        ]
+      },
+      "Menos Grande": {
+        hp: 100,
+        abilities: [
+          { name: "Mordida", value: 20 },
+          { name: "Arranhar", value: 20 },
+          { name: "CERO", value: 40 }
+        ]
+      },
+      "Adjucha": {
+        hp: 300,
+        abilities: [
+          { name: "Mordida", value: 50 },
+          { name: "Arranhar", value: 50 },
+          { name: "CERO", value: 100 },
+          { name: "Regeneração", value: 50 } // valor de cura
+        ]
+      },
+      "Vasto Lorde": {
+        hp: 750,
+        abilities: [
+          { name: "Cortes", value: 150 },
+          { name: "CERO", value: 300 },
+          { name: "Balas", value: 70, multi: true },   // 2-5 golpes de 70
+          { name: "Grand-Cero", value: 500 },
+          { name: "Regeneração", value: 50 }
+        ]
+      }
     };
 
     // -------------------- Classe Hollow --------------------
     class Hollow {
-      constructor(name, form = "Hollow Comum", xp = 0, isEnemy = false) {
+      constructor(name, form = "Hollow Comum", xp = 0, isEnemy = false, typeName = null) {
         this.name = name;
         this.form = form;
         this.xp = xp;
         this.isEnemy = isEnemy;
-        const stats = FORMS[form];
-        this.maxHp = stats.hp;
+        this.typeName = typeName; // nome temático (ex: "Prices")
+        const data = FORM_ABILITIES[form];
+        this.maxHp = data.hp;
         this.hp = this.maxHp;
-        this.atk = stats.atk;
-        this.def = stats.def;
-        this.xpNeeded = stats.xpNeeded;
-        this.abilities = [...stats.abilities];
-        // Efeitos temporários
-        this.bonusDef = 0;
-        this.bonusAtk = 0;
-        this.stunned = false;
-        this.poison = 0; // dano por veneno no próximo turno
-        this.dot = 0;    // sangramento
+        this.abilities = data.abilities.map(a => ({...a})); // cópia
+        this.xpNeeded = this.getXpNeeded();
+      }
+
+      getXpNeeded() {
+        if (this.form === "Hollow Comum") return 20;
+        if (this.form === "Menos Grande") return 60;
+        if (this.form === "Adjucha") return 150;
+        return Infinity;
       }
 
       isAlive() { return this.hp > 0; }
 
-      applyTempEffects() {
-        if (this.poison > 0) {
-          this.hp -= this.poison;
-          this.poison = 0;
-        }
-        if (this.dot > 0) {
-          this.hp -= this.dot;
-          this.dot = 0;
-        }
-        if (this.hp < 0) this.hp = 0;
-        if (this.bonusDef > 0) this.bonusDef = 0; // dura 1 turno
-        if (this.bonusAtk > 0) this.bonusAtk = 0;
-      }
-
-      getEffectiveAtk() { return this.atk + this.bonusAtk; }
-      getEffectiveDef() { return this.def + this.bonusDef; }
-
-      attack(target, ability = "Claws") {
-        const effect = ABILITY_EFFECTS[ability] || { dmgMult: 1.0 };
-        let baseDmg = this.getEffectiveAtk() - target.getEffectiveDef();
-        if (baseDmg < 1) baseDmg = 1;
-        if (effect.ignoreDef) {
-          baseDmg = this.getEffectiveAtk() - Math.floor(target.def * (1 - effect.ignoreDef));
-          if (baseDmg < 1) baseDmg = 1;
-        }
-        let dmg = Math.floor(baseDmg * (effect.dmgMult || 1.0));
-        let msg = `${this.name} usou ${ability}. `;
-
-        // Múltiplos golpes (ex: Fingers)
-        if (effect.hits) {
-          dmg = 0;
-          for (let i = 0; i < effect.hits; i++) {
-            let hitDmg = Math.floor(baseDmg * (effect.dmgMult || 1.0));
-            dmg += hitDmg;
-          }
-          msg += `${effect.hits} golpes! `;
-        }
-
-        // Autodano (Muscles, Tyranny)
-        if (effect.selfDmgPct) {
-          const selfDmg = Math.floor(this.hp * effect.selfDmgPct);
-          this.hp = Math.max(0, this.hp - selfDmg);
-          msg += `Você se feriu e perdeu ${selfDmg} HP. `;
-        }
-
-        // Cura baseada em percentual do HP máximo (Prices? não, Prices tem bonusXp)
-        if (effect.healPct) {
-          const heal = Math.floor(this.maxHp * effect.healPct);
+      // Executa a habilidade escolhida contra o alvo, retorna {dmg, msg}
+      useAbility(abilityName, target) {
+        const ab = this.abilities.find(a => a.name === abilityName);
+        if (!ab) return { dmg: 0, msg: "Habilidade inválida." };
+        let dmg = 0;
+        let msg = "";
+        if (ab.name === "Regeneração") {
+          // Cura a si mesmo (não causa dano)
+          const heal = ab.value;
           this.hp = Math.min(this.maxHp, this.hp + heal);
-          msg += `Você se curou em ${heal} HP. `;
+          return { dmg: 0, msg: `${this.name} usou Regeneração e recuperou ${heal} HP.` };
+        } else if (ab.multi) {
+          // Balas: número aleatório de golpes (2-5)
+          const hits = Math.floor(Math.random() * 4) + 2; // 2 a 5
+          dmg = ab.value * hits;
+          msg = `${this.name} usou ${ab.name} (${hits} golpes) e causou ${dmg} de dano.`;
+        } else {
+          dmg = ab.value;
+          msg = `${this.name} usou ${ab.name} e causou ${dmg} de dano.`;
         }
-
-        // Cura baseada no dano causado (Hungry, Gluttony)
-        if (effect.healFromDmg) {
-          const heal = Math.floor(dmg * effect.healFromDmg);
-          this.hp = Math.min(this.maxHp, this.hp + heal);
-          msg += `Você drenou ${heal} HP. `;
-        }
-
-        // Bônus de XP (Prices)
-        if (effect.bonusXp) {
-          this.xp += effect.bonusXp;
-          msg += `(+${effect.bonusXp} XP extra) `;
-        }
-
-        // Buff de defesa (Eyes closed)
-        if (effect.buffDef) {
-          this.bonusDef = effect.buffDef;
-          msg += `Sua defesa aumentou em ${effect.buffDef} por 1 turno. `;
-        }
-
-        // Buff de ataque (Warlord)
-        if (effect.buffAtk) {
-          this.bonusAtk = effect.buffAtk;
-          msg += `Seu ataque aumentou em ${effect.buffAtk} por 1 turno. `;
-        }
-
-        // Aplicar dano ao alvo
         target.hp -= dmg;
-        msg += `Causou ${dmg} de dano.`;
-
-        // Efeitos no alvo: stun (Nerves)
-        if (effect.stunChance && Math.random() < effect.stunChance) {
-          target.stunned = true;
-          msg += ` ${target.name} está atordoado!`;
-        }
-        // Veneno (Vomit)
-        if (effect.poisonChance && Math.random() < effect.poisonChance) {
-          target.poison = effect.poisonDmg;
-          msg += ` ${target.name} foi envenenado!`;
-        }
-        // Sangramento (Scratch)
-        if (effect.dotChance && Math.random() < effect.dotChance) {
-          target.dot = effect.dotDmg;
-          msg += ` ${target.name} está sangrando!`;
-        }
-
         return { dmg, msg };
       }
 
       eat(prey) {
         const gain = prey.xp + Math.floor(Math.random() * 15) + 5;
         this.xp += gain;
-        const msg = `Você devorou ${prey.name} e ganhou ${gain} de XP. (Total: ${this.xp}/${this.xpNeeded})`;
+        const msg = `Você devorou ${prey.name} (${prey.typeName || prey.form}) e ganhou ${gain} de XP. (Total: ${this.xp}/${this.xpNeeded})`;
         this.checkEvolution();
         return msg;
       }
@@ -279,19 +213,11 @@
 
       evolve(newForm) {
         this.form = newForm;
-        const s = FORMS[newForm];
-        this.maxHp = s.hp;
+        const data = FORM_ABILITIES[newForm];
+        this.maxHp = data.hp;
         this.hp = this.maxHp;
-        this.atk = s.atk;
-        this.def = s.def;
-        this.xpNeeded = s.xpNeeded;
-        this.abilities = [...s.abilities];
-        // Limpar efeitos
-        this.bonusDef = 0;
-        this.bonusAtk = 0;
-        this.stunned = false;
-        this.poison = 0;
-        this.dot = 0;
+        this.abilities = data.abilities.map(a => ({...a}));
+        this.xpNeeded = this.getXpNeeded();
         addLog(`🌟 EVOLUÇÃO! Agora você é um ${newForm}!`, 'evolucao');
       }
     }
@@ -303,10 +229,14 @@
       else if (playerLevel === 1) form = Math.random() < 0.6 ? "Menos Grande" : "Adjucha";
       else if (playerLevel === 2) form = Math.random() < 0.7 ? "Adjucha" : "Vasto Lorde";
       else form = "Vasto Lorde";
-      const names = ["Rastejante", "Uivador", "Devorador", "Sombra Cruel", "Mandíbula", "Garranegra", "Olho Oco"];
-      const name = names[Math.floor(Math.random() * names.length)];
+      // Escolhe um nome temático aleatório da lista correspondente
+      const typeNames = HOLLOW_TYPES[form];
+      const typeName = typeNames[Math.floor(Math.random() * typeNames.length)];
+      // Gera nome completo: Ex: "Prices (Hollow Comum)"
+      const displayName = typeName;
       const xp = Math.floor(Math.random() * 25) + 5;
-      return new Hollow(name, form, xp, true);
+      const enemy = new Hollow(displayName, form, xp, true, typeName);
+      return enemy;
     }
 
     // -------------------- Estado do jogo --------------------
@@ -346,10 +276,8 @@
         <strong>${player.name}</strong> [${player.form}]<br>
         HP: ${player.hp}/${player.maxHp} 
         <div class="bar-container"><div class="bar-fill green" style="width:${(player.hp/player.maxHp)*100}%"></div></div>
-        ATK: ${player.getEffectiveAtk()} | DEF: ${player.getEffectiveDef()} | XP: ${player.xp}/${player.xpNeeded}
-        <br>Habilidades: ${player.abilities.join(', ')}
-        ${player.bonusAtk ? ' <span style="color:#ffaa00;">(Atk+)</span>' : ''}
-        ${player.bonusDef ? ' <span style="color:#aaaaff;">(Def+)</span>' : ''}
+        XP: ${player.xp}/${player.xpNeeded}<br>
+        Habilidades: ${player.abilities.map(a => a.name).join(', ')}
       `;
     }
 
@@ -359,9 +287,6 @@
         <strong>${currentEnemy.name}</strong> [${currentEnemy.form}]<br>
         HP: ${currentEnemy.hp}/${currentEnemy.maxHp}
         <div class="bar-container"><div class="bar-fill" style="width:${(currentEnemy.hp/currentEnemy.maxHp)*100}%"></div></div>
-        ${currentEnemy.stunned ? ' <span style="color:yellow;">(Atordoado)</span>' : ''}
-        ${currentEnemy.poison ? ' <span style="color:green;">(Envenenado)</span>' : ''}
-        ${currentEnemy.dot ? ' <span style="color:red;">(Sangrando)</span>' : ''}
       `;
     }
 
@@ -370,8 +295,8 @@
       actionsDiv.innerHTML = '';
       player.abilities.forEach(ab => {
         const btn = document.createElement('button');
-        btn.textContent = ab;
-        btn.addEventListener('click', () => playerTurn(ab));
+        btn.textContent = ab.name;
+        btn.addEventListener('click', () => playerTurn(ab.name));
         actionsDiv.appendChild(btn);
       });
     }
@@ -406,18 +331,10 @@
       }
     }
 
-    function playerTurn(ability) {
+    function playerTurn(abilityName) {
       if (!currentEnemy || !player.isAlive()) return;
-
-      // Aplica efeitos temporários do turno anterior (veneno, sangramento, stun do inimigo)
-      currentEnemy.applyTempEffects();
-      if (!currentEnemy.isAlive()) {
-        addLog(`${currentEnemy.name} sucumbiu aos efeitos!`);
-        endCombat(true);
-        return;
-      }
-
-      const result = player.attack(currentEnemy, ability);
+      // Jogador ataca
+      const result = player.useAbility(abilityName, currentEnemy);
       addLog(result.msg, 'highlight');
       updateEnemyStats();
       updatePlayerStats('player-stats-combat');
@@ -428,38 +345,17 @@
         return;
       }
 
-      // Turno do inimigo (se não estiver atordoado)
-      if (!currentEnemy.stunned) {
-        currentEnemy.applyTempEffects();
-        if (!currentEnemy.isAlive()) {
-          addLog(`${currentEnemy.name} morreu devido aos ferimentos.`);
-          endCombat(true);
-          return;
-        }
-        const enemyAb = currentEnemy.abilities[Math.floor(Math.random() * currentEnemy.abilities.length)];
-        const enemyResult = currentEnemy.attack(player, enemyAb);
-        addLog(enemyResult.msg);
-        player.applyTempEffects();
-        updatePlayerStats('player-stats-combat');
-        updateEnemyStats();
+      // Inimigo contra-ataca (escolhe habilidade aleatória)
+      const enemyAb = currentEnemy.abilities[Math.floor(Math.random() * currentEnemy.abilities.length)];
+      const enemyResult = currentEnemy.useAbility(enemyAb.name, player);
+      addLog(enemyResult.msg);
+      updatePlayerStats('player-stats-combat');
+      updateEnemyStats();
 
-        if (!player.isAlive()) {
-          addLog("Você caiu em combate...");
-          endCombat(false);
-          return;
-        }
-      } else {
-        addLog(`${currentEnemy.name} está atordoado e não pode agir!`);
-        currentEnemy.stunned = false; // stun passa após perder o turno
-      }
-
-      // Ao final do turno do jogador, também aplicamos efeitos nele (caso tenha veneno/sangramento aplicado pelo inimigo)
-      player.applyTempEffects();
       if (!player.isAlive()) {
-        addLog("Você morreu devido aos ferimentos.");
+        addLog("Você caiu em combate...");
         endCombat(false);
       }
-      updatePlayerStats('player-stats-combat');
     }
 
     function explore() {
@@ -502,7 +398,6 @@
     document.getElementById('hunt-btn').addEventListener('click', hunt);
     document.getElementById('explore-btn').addEventListener('click', explore);
 
-    // Iniciar na tela de nome
     showScreen(startScreen);
   })();
 </script>
