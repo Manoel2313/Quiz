@@ -1,605 +1,814 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Projeto O₂: Ascensão · Imersivo</title>
-  <style>
-    :root {
-      --bg: #0b0e0c;
-      --gold: #e6b34a;
-      --gold-glow: #e6b34a66;
-      --rust: #b45a3c;
-      --rust-glow: #b45a3c66;
-      --ember: #d94f3a;
-      --ember-glow: #d94f3a66;
-      --ocean: #60b5cc;
-      --ocean-glow: #60b5cc55;
-      --leaf: #6bbf6b;
-      --leaf-glow: #6bbf6b66;
-      --panel: rgba(18, 22, 18, 0.8);
-      --border: rgba(220, 200, 140, 0.15);
-      --border-active: rgba(230, 180, 70, 0.5);
-      --text: #e0dac8;
-      --text-dim: #a8a290;
-      --font-main: 'Inter', system-ui, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-      --radius: 18px;
-      --ease-spring: cubic-bezier(0.4, 1.6, 0.5, 1);
-      --ease-smooth: cubic-bezier(0.2, 0.9, 0.3, 1);
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: var(--font-main);
-      background: #080b09;
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      margin: 0;
-      background-image: radial-gradient(circle at 20% 30%, rgba(60, 40, 30, 0.25), transparent 50%),
-                        radial-gradient(circle at 80% 70%, rgba(20, 40, 35, 0.25), transparent 50%);
-    }
-    #game-container {
-      width: 100%;
-      max-width: 780px;
-      background: rgba(18, 22, 18, 0.7);
-      backdrop-filter: blur(28px);
-      border: 1px solid var(--border);
-      border-radius: 32px;
-      padding: 2rem 2rem 1.8rem;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 30px rgba(100, 80, 40, 0.15);
-      position: relative;
-      transition: all 0.4s var(--ease-smooth);
-      display: flex;
-      flex-direction: column;
-      gap: 1.4rem;
-    }
-    .theme-bunker {
-      border-color: rgba(230, 180, 70, 0.4);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 40px rgba(230, 180, 70, 0.2);
-      background: rgba(24, 22, 14, 0.75);
-    }
-    .theme-surface {
-      border-color: rgba(180, 90, 50, 0.45);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 35px rgba(160, 80, 40, 0.25);
-      background: rgba(28, 22, 18, 0.75);
-    }
-    .theme-combat {
-      border-color: rgba(220, 60, 50, 0.7);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 60px rgba(220, 60, 50, 0.45);
-      background: rgba(35, 12, 10, 0.85);
-      animation: panicPulse 0.7s infinite alternate;
-    }
-    @keyframes panicPulse {
-      from { box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 60px rgba(220, 60, 50, 0.45); background: rgba(35, 12, 10, 0.85); }
-      to { box-shadow: 0 25px 50px rgba(0,0,0,0.9), 0 0 85px rgba(240, 70, 50, 0.7); background: rgba(48, 8, 5, 0.9); }
-    }
-    .theme-inventory {
-      border-color: rgba(96, 180, 200, 0.4);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 35px rgba(96, 180, 200, 0.2);
-      background: rgba(14, 22, 26, 0.8);
-    }
-    .hidden { display:none !important; }
-    h2 {
-      font-weight: 600;
-      font-size: 1.9rem;
-      letter-spacing: 0.5px;
-    }
-    .status-row {
-      display: flex;
-      gap: 0.9rem;
-      flex-wrap: wrap;
-    }
-    .stat {
-      flex:1; min-width:80px;
-      background: rgba(10,10,10,0.5);
-      border:1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 0.7rem 0.5rem;
-      text-align: center;
-      backdrop-filter: blur(12px);
-    }
-    .stat-label {
-      font-size:0.7rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-dim);
-    }
-    .stat-value {
-      font-family: var(--font-mono);
-      font-size: 1.8rem;
-      font-weight: 600;
-      line-height: 1.2;
-    }
-    .bar-horizontal {
-      height: 8px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 10px;
-      margin: 6px 0 16px;
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #e6b34a, #c49a3c);
-      border-radius: 10px;
-      box-shadow: 0 0 12px var(--gold-glow);
-      transition: width 0.6s var(--ease-smooth);
-    }
-    .log-panel {
-      background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 1rem;
-      height: 160px;
-      overflow-y: auto;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      color: #c0b890;
-      line-height: 1.5;
-      backdrop-filter: blur(8px);
-    }
-    .choices-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .choice-btn {
-      background: rgba(20,20,18,0.7);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,200,0.08);
-      border-radius: 20px;
-      padding: 0.9rem 1.2rem;
-      color: #ddd;
-      font-size: 0.95rem;
-      font-weight: 500;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.25s var(--ease-spring);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .choice-btn:hover {
-      background: rgba(40,38,30,0.8);
-      border-color: var(--border-active);
-      transform: translateX(6px);
-      box-shadow: 0 0 18px rgba(200,160,60,0.2);
-    }
-    .choice-btn:active { transform:scale(0.97); }
-    .btn-special {
-      background: linear-gradient(135deg, rgba(230,180,70,0.12), rgba(180,90,50,0.08));
-      border-color: rgba(230,180,70,0.35);
-    }
-    .btn-disabled { opacity:0.4; pointer-events:none; }
-    .inv-btn {
-      position: absolute;
-      top: 20px;
-      right: 24px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      padding: 6px 16px;
-      color: #ccc;
-      font-size: 0.85rem;
-      cursor: pointer;
-      z-index: 10;
-    }
-    .character-mood {
-      font-size: 0.9rem;
-      color: var(--text-dim);
-      margin-bottom: 6px;
-    }
-    .inv-item-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.8rem;
-      background: rgba(0,0,0,0.3);
-      border-radius: 12px;
-      margin-bottom: 8px;
-    }
-    .inv-item-row span { font-weight: 600; }
-    .inv-use-btn {
-      background: var(--gold);
-      border: none;
-      color: #000;
-      padding: 6px 14px;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    @media (max-width:600px) {
-      #game-container { padding:1.5rem; }
-      h2 { font-size:1.4rem; }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bloco de Notas · Buscar & Trocar</title>
+    <style>
+        /* ── Reset & Base ── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b0d10;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
+        .app {
+            max-width: 920px;
+            width: 100%;
+            background: #14171c;
+            border-radius: 28px;
+            padding: 2rem 2rem 1.8rem;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.8),
+                inset 0 1px 1px rgba(255, 255, 255, 0.04);
+            transition: box-shadow 0.3s;
+        }
+
+        /* ── Cabeçalho ── */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            user-select: none;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #e8edf2;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .header h1 span {
+            background: #2a2f36;
+            padding: 0.15rem 0.65rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #8896a6;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .badge-count {
+            margin-left: auto;
+            background: #1e2329;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            color: #8896a6;
+            border: 1px solid #282f36;
+            transition: all 0.25s;
+        }
+
+        .badge-count.active {
+            background: #1e2a2f;
+            border-color: #3d6b7a;
+            color: #7fc1d4;
+        }
+
+        /* ── Área de texto ── */
+        .editor-wrap {
+            position: relative;
+            border-radius: 16px;
+            background: #0e1115;
+            border: 1px solid #232a30;
+            transition: border-color 0.25s;
+            margin-bottom: 1.2rem;
+        }
+
+        .editor-wrap:focus-within {
+            border-color: #3d6b7a;
+            box-shadow: 0 0 0 3px rgba(61, 107, 122, 0.15);
+        }
+
+        #editor {
+            width: 100%;
+            min-height: 260px;
+            max-height: 460px;
+            padding: 1.2rem 1.4rem;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #d6dee6;
+            background: transparent;
+            border: none;
+            outline: none;
+            resize: vertical;
+            font-family: 'Segoe UI', 'SF Mono', 'Cascadia Code', monospace;
+            letter-spacing: 0.2px;
+            tab-size: 2;
+        }
+
+        #editor::placeholder {
+            color: #3f484f;
+            font-weight: 300;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        /* ── Preview com highlights ── */
+        .preview-wrap {
+            border-radius: 16px;
+            background: #0e1115;
+            border: 1px solid #1e2429;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: border-color 0.25s;
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 1.2rem;
+            background: #12171c;
+            border-bottom: 1px solid #1e2429;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #5a6877;
+        }
+
+        .preview-header .hint {
+            color: #3a4855;
+            font-size: 0.65rem;
+        }
+
+        #preview {
+            padding: 1.2rem 1.4rem;
+            min-height: 80px;
+            max-height: 220px;
+            overflow-y: auto;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #bcc9d6;
+            font-family: 'Segoe UI', 'SF Mono', 'Cascadia Code', monospace;
+            white-space: pre-wrap;
+            word-break: break-word;
+            scroll-behavior: smooth;
+        }
+
+        #preview mark {
+            background: #d4a13e;
+            color: #0b0d10;
+            padding: 0.1rem 0.15rem;
+            border-radius: 4px;
+            font-weight: 600;
+            box-shadow: 0 0 0 1px rgba(212, 161, 62, 0.3);
+            transition: background 0.15s;
+        }
+
+        #preview .empty-hint {
+            color: #3a4855;
+            font-style: italic;
+            font-weight: 300;
+        }
+
+        /* ── Controles ── */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            align-items: flex-end;
+            margin-bottom: 1.2rem;
+        }
+
+        .control-group {
+            flex: 1 1 200px;
+            min-width: 140px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .control-group label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #5a6877;
+            font-weight: 600;
+        }
+
+        .control-group .input-row {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .control-group input {
+            flex: 1;
+            padding: 0.55rem 0.9rem;
+            border-radius: 10px;
+            border: 1px solid #232a30;
+            background: #0e1115;
+            color: #d6dee6;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-width: 0;
+        }
+
+        .control-group input::placeholder {
+            color: #3f484f;
+            font-weight: 300;
+        }
+
+        .control-group input:focus {
+            border-color: #3d6b7a;
+            box-shadow: 0 0 0 3px rgba(61, 107, 122, 0.12);
+        }
+
+        .btn {
+            padding: 0.55rem 1.1rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #232a30;
+            color: #bcc9d6;
+            border: 1px solid transparent;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.08);
+        }
+
+        .btn:active {
+            transform: translateY(0px);
+            filter: brightness(0.92);
+        }
+
+        .btn-primary {
+            background: #2a5f6e;
+            color: #f0f7fa;
+            border-color: #3a7a8a;
+        }
+
+        .btn-primary:hover {
+            background: #326e7e;
+            border-color: #4a8a9a;
+        }
+
+        .btn-success {
+            background: #2b5e4a;
+            color: #f0f7fa;
+            border-color: #3a7a5a;
+        }
+
+        .btn-success:hover {
+            background: #347a5a;
+            border-color: #4a8a6a;
+        }
+
+        .btn-danger {
+            background: #5e2e2e;
+            color: #f0f0f0;
+            border-color: #7a3a3a;
+        }
+
+        .btn-danger:hover {
+            background: #6e3a3a;
+            border-color: #8a4a4a;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: #2a323a;
+            color: #7a8a9a;
+        }
+
+        .btn-outline:hover {
+            border-color: #4a5a6a;
+            color: #bcc9d6;
+            background: #1a1f24;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+            filter: none !important;
+        }
+
+        /* ── Status / rodapé ── */
+        .status-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.8rem;
+            border-top: 1px solid #1a1f24;
+            font-size: 0.8rem;
+            color: #5a6877;
+            gap: 0.5rem;
+        }
+
+        .status-bar .stats {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .status-bar .stats span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .status-bar .stats .num {
+            color: #bcc9d6;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            min-width: 1.8rem;
+        }
+
+        .status-bar .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.2rem 0.7rem;
+            font-size: 0.7rem;
+            border-radius: 6px;
+            background: #1a1f24;
+            color: #7a8a9a;
+            border: 1px solid #232a30;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-sm:hover {
+            background: #232a30;
+            color: #bcc9d6;
+        }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0e1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a323a;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a4a5a;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            .app {
+                padding: 1.2rem 1rem 1rem;
+                border-radius: 20px;
+            }
+
+            .header h1 {
+                font-size: 1rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 0.6rem;
+            }
+
+            .control-group {
+                flex: 1 1 auto;
+                min-width: 0;
+                width: 100%;
+            }
+
+            .control-group .input-row {
+                flex-wrap: wrap;
+            }
+
+            .control-group .input-row input {
+                flex: 1 1 120px;
+            }
+
+            .btn {
+                padding: 0.45rem 0.9rem;
+                font-size: 0.8rem;
+                flex: 1;
+                justify-content: center;
+            }
+
+            #editor {
+                min-height: 180px;
+                padding: 0.9rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            #preview {
+                min-height: 60px;
+                padding: 0.9rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .status-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+
+            .status-bar .actions {
+                justify-content: flex-end;
+            }
+
+            .badge-count {
+                font-size: 0.65rem;
+                padding: 0.15rem 0.7rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .header h1 span {
+                display: none;
+            }
+
+            .btn {
+                font-size: 0.7rem;
+                padding: 0.35rem 0.6rem;
+            }
+
+            .control-group input {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.6rem;
+            }
+        }
+
+        /* ── Animação de destaque ── */
+        @keyframes flash-highlight {
+            0% {
+                background: #d4a13e;
+                color: #0b0d10;
+            }
+            100% {
+                background: #d4a13e;
+                color: #0b0d10;
+            }
+        }
+
+        #preview mark.flash {
+            animation: flash-highlight 0.6s ease 2;
+        }
+
+        /* ── Tooltip ── */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1a1f24;
+            color: #d6dee6;
+            padding: 0.6rem 1.6rem;
+            border-radius: 40px;
+            border: 1px solid #2a323a;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: none;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            z-index: 999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
 </head>
 <body>
-<div id="game-container">
-  <button class="inv-btn" id="openInventoryBtn">🎒 Inventário</button>
 
-  <!-- TELA INÍCIO -->
-  <div id="screen-start">
-    <h2>🌱 Projeto O₂: Ascensão</h2>
-    <p style="color:var(--text-dim); margin-bottom:1rem;">Ano 2326. Superfície devastada. Você é um Ascensor.</p>
-    <input type="text" id="nameInput" placeholder="Seu nome..." maxlength="20" style="width:100%; padding:12px; border-radius:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); color:white; margin-bottom:1rem;">
-    <button class="choice-btn btn-special" id="startGameBtn" style="width:100%; justify-content:center;">Iniciar Jornada</button>
-  </div>
+    <div class="app">
+        <!-- Cabeçalho -->
+        <div class="header">
+            <h1>
+                📝 Bloco de Notas
+                <span>Buscar &amp; Trocar</span>
+            </h1>
+            <div class="badge-count" id="badgeCount">0 ocorrências</div>
+        </div>
 
-  <!-- BUNKER -->
-  <div id="screen-bunker" class="hidden">
-    <h2>🏠 Bunker</h2>
-    <div id="bunkerInfo"></div>
-    <div class="bar-horizontal"><div class="bar-fill" id="vegBar"></div></div>
-    <p style="font-size:0.9rem;">🌿 Vegetação: <span id="vegPercent">0%</span></p>
-    <div class="choices-grid" id="bunkerActions"></div>
-    <button class="choice-btn btn-special" id="goSurfaceBtn" style="width:100%; justify-content:center;">🌍 Ir para a Superfície</button>
-  </div>
+        <!-- Editor -->
+        <div class="editor-wrap">
+            <textarea id="editor" placeholder="Digite ou cole seu texto aqui…" spellcheck="true"></textarea>
+        </div>
 
-  <!-- SUPERFÍCIE -->
-  <div id="screen-surface" class="hidden">
-    <div class="character-mood" id="moodText"></div>
-    <h2>🌫️ Superfície Tóxica</h2>
-    <div class="status-row" id="surfaceStats"></div>
-    <div class="log-panel" id="surfaceLog"></div>
-    <div class="choices-grid" id="surfaceChoices"></div>
-  </div>
+        <!-- Controles -->
+        <div class="controls">
+            <!-- Buscar -->
+            <div class="control-group">
+                <label for="searchInput">🔍 Procurar</label>
+                <div class="input-row">
+                    <input type="text" id="searchInput" placeholder="Palavra…" />
+                    <button class="btn btn-primary" id="btnSearch">Buscar</button>
+                </div>
+            </div>
 
-  <!-- COMBATE -->
-  <div id="screen-combat" class="hidden">
-    <h2>⚔️ Confronto</h2>
-    <div class="status-row" id="combatStats"></div>
-    <p id="combatDesc" style="color:#e0b0a0;"></p>
-    <div class="choices-grid" id="combatChoices"></div>
-  </div>
+            <!-- Trocar -->
+            <div class="control-group">
+                <label for="replaceInput">🔄 Trocar por</label>
+                <div class="input-row">
+                    <input type="text" id="replaceInput" placeholder="Nova palavra…" />
+                    <button class="btn btn-success" id="btnReplace">Trocar</button>
+                </div>
+            </div>
+        </div>
 
-  <!-- INVENTÁRIO -->
-  <div id="screen-inventory" class="hidden">
-    <h2 style="color:#9ad0e0;">🎒 Inventário</h2>
-    <div id="invContent"></div>
-    <button class="choice-btn" id="closeInvBtn" style="width:100%; justify-content:center; margin-top:12px;">Fechar</button>
-  </div>
-</div>
+        <!-- Preview com destaques -->
+        <div class="preview-wrap">
+            <div class="preview-header">
+                <span>📋 Visualização com destaque</span>
+                <span class="hint">as ocorrências aparecem em <strong style="color:#d4a13e;">amarelo</strong></span>
+            </div>
+            <div id="preview">
+                <span class="empty-hint">Nenhum texto para exibir. Digite ou cole algo no campo acima.</span>
+            </div>
+        </div>
 
-<script>
-  (function() {
-    // ESTADO
-    const S = {
-      name: '', hp:100, maxHp:100, energy:100, maxEnergy:100, hunger:0, maxHunger:100,
-      coins:0, scrap:0, turn:1, maxTurns:10, vegetation:0,
-      inventory: { food:3, medkit:1, sensor:0, grenade:0, seeds:0 },
-      suitLvl:0, mutantWounded:false, mutantHp:0,
-      currentScreen:'start', previousScreen:null,
-    };
+        <!-- Status -->
+        <div class="status-bar">
+            <div class="stats">
+                <span>📄 <span class="num" id="charCount">0</span> caracteres</span>
+                <span>📝 <span class="num" id="wordCount">0</span> palavras</span>
+                <span>🎯 <span class="num" id="matchCount">0</span> coincidências</span>
+            </div>
+            <div class="actions">
+                <button class="btn-sm" id="btnClear" title="Limpar tudo">🗑️ Limpar</button>
+                <button class="btn-sm" id="btnClearHighlights" title="Remover destaques">✨ Limpar destaques</button>
+            </div>
+        </div>
+    </div>
 
-    const container = document.getElementById('game-container');
-    function setTheme(t) {
-      container.className = '';
-      if(t) container.classList.add('theme-'+t);
-    }
-    function showScreen(id, theme) {
-      ['start','bunker','surface','combat','inventory'].forEach(s=>document.getElementById('screen-'+s).classList.add('hidden'));
-      document.getElementById('screen-'+id).classList.remove('hidden');
-      S.currentScreen = id;
-      setTheme(theme||'');
-    }
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
 
-    const vegBar = document.getElementById('vegBar');
-    const vegPercent = document.getElementById('vegPercent');
-    function updateVegUI() { vegBar.style.width = S.vegetation+'%'; vegPercent.textContent = S.vegetation+'%'; }
+    <script>
+        (function() {
+            'use strict';
 
-    function surfaceStatsHTML() {
-      return `
-        <div class="stat"><div class="stat-label">❤️ Vida</div><div class="stat-value" style="color:#e05a4a;">${S.hp}/${S.maxHp}</div></div>
-        <div class="stat"><div class="stat-label">⚡ Energia</div><div class="stat-value" style="color:#e6b34a;">${S.energy}/${S.maxEnergy}</div></div>
-        <div class="stat"><div class="stat-label">🍖 Fome</div><div class="stat-value" style="color:#d9783c;">${S.hunger}/${S.maxHunger}</div></div>
-        <div class="stat"><div class="stat-label">🕒 Turno</div><div class="stat-value">${S.turn}/${S.maxTurns}</div></div>
-        <div class="stat"><div class="stat-label">💰 Sucata</div><div class="stat-value" style="color:#e6b34a;">${S.scrap}</div></div>
-      `;
-    }
-    function combatStatsHTML() {
-      return `
-        <div class="stat"><div class="stat-label">❤️ Você</div><div class="stat-value" style="color:#e05a4a;">${S.hp}</div></div>
-        <div class="stat"><div class="stat-label">👾 Mutante</div><div class="stat-value" style="color:#e05a4a;">${S.mutantHp}</div></div>
-      `;
-    }
+            // ── DOM refs ──
+            const editor = document.getElementById('editor');
+            const preview = document.getElementById('preview');
+            const searchInput = document.getElementById('searchInput');
+            const replaceInput = document.getElementById('replaceInput');
+            const btnSearch = document.getElementById('btnSearch');
+            const btnReplace = document.getElementById('btnReplace');
+            const btnClear = document.getElementById('btnClear');
+            const btnClearHighlights = document.getElementById('btnClearHighlights');
+            const badgeCount = document.getElementById('badgeCount');
+            const charCount = document.getElementById('charCount');
+            const wordCount = document.getElementById('wordCount');
+            const matchCount = document.getElementById('matchCount');
+            const toast = document.getElementById('toast');
 
-    const logDiv = document.getElementById('surfaceLog');
-    function addLog(msg, cls='') {
-      const d = document.createElement('div'); d.textContent = msg;
-      if(cls==='danger') d.style.color='#e05a4a';
-      else if(cls==='success') d.style.color='#8bc78b';
-      else d.style.color='#b0c0d0';
-      logDiv.appendChild(d); logDiv.scrollTop = logDiv.scrollHeight;
-    }
-    function clearLog() { logDiv.innerHTML = ''; }
-    function moodText() {
-      let mood = '';
-      if(S.hunger>70) mood = '☠️ Faminto e fraco.';
-      else if(S.hp<30) mood = '🩸 Ferido. Cada passo dói.';
-      else if(S.energy<25) mood = '💤 Exausto. Preciso descansar.';
-      else if(S.scrap>20) mood = '💰 Carregado! Hora de voltar?';
-      else mood = '🌫️ O ar pesa... mas sigo.';
-      document.getElementById('moodText').textContent = mood;
-    }
+            // ── Estado ──
+            let currentSearchTerm = '';
+            let lastPlainText = '';
 
-    function checkGameOver() {
-      if(S.hp<=0) { S.hp=0; addLog('💀 Desmaio... resgatado.', 'danger'); loseExpedition(); return true; }
-      if(S.energy<=0) { S.energy=0; addLog('😵 Exaustão total.', 'danger'); loseExpedition(); return true; }
-      if(S.hunger>=S.maxHunger) { addLog('🤢 Desmaio de fome.', 'danger'); loseExpedition(); return true; }
-      return false;
-    }
-    function loseExpedition() {
-      S.scrap = 0;
-      returnToBunker();
-    }
+            // ── Utilitários ──
+            function getPlainText() {
+                return editor.value;
+            }
 
-    function resetStatus() {
-      S.hp = S.maxHp;
-      S.energy = S.maxEnergy;
-      S.hunger = 0;
-    }
+            function updateStats(text) {
+                const len = text.length;
+                const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+                charCount.textContent = len;
+                wordCount.textContent = words;
+            }
 
-    function returnToBunker() {
-      S.coins += S.scrap;
-      S.scrap = 0;
-      S.vegetation = Math.min(100, S.vegetation + 5);
-      if(S.inventory.seeds>0) { S.vegetation = Math.min(100, S.vegetation + S.inventory.seeds*2); S.inventory.seeds=0; }
-      updateVegUI();
-      resetStatus(); // Vida, energia, fome resetados ao voltar
-      document.getElementById('bunkerInfo').innerHTML = `🔋 Vida ${S.hp}/${S.maxHp} · ⚡ ${S.energy} · 🍖 ${S.hunger} · 💰 ${S.coins} moedas`;
-      renderBunkerShop();
-      showScreen('bunker','bunker');
-      if(S.vegetation>=100) victory();
-    }
+            function showToast(msg, duration = 2000) {
+                toast.textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, duration);
+            }
 
-    function victory() {
-      document.getElementById('bunkerInfo').innerHTML = '<h2 style="color:#8bc78b;">🌍 VITÓRIA! A Terra respira novamente.</h2>';
-    }
+            // ── Highlight no preview ──
+            function renderPreview(text, searchTerm) {
+                if (!text) {
+                    preview.innerHTML = `<span class="empty-hint">Nenhum texto para exibir. Digite ou cole algo no campo acima.</span>`;
+                    matchCount.textContent = '0';
+                    badgeCount.textContent = '0 ocorrências';
+                    badgeCount.classList.remove('active');
+                    return;
+                }
 
-    function nextTurn() {
-      if(checkGameOver()) return;
-      S.turn++;
-      S.hunger = Math.min(S.maxHunger, S.hunger+5);
-      if(S.turn > S.maxTurns) { addLog('⏳ Oxigênio esgotado. Retorno forçado.','danger'); S.hp-=5; returnToBunker(); return; }
-      moodText();
-      addLog(`Turno ${S.turn}/${S.maxTurns}`);
-      generateSurfaceChoices();
-    }
+                if (!searchTerm || searchTerm.trim() === '') {
+                    // sem busca: mostra texto puro
+                    preview.textContent = text;
+                    matchCount.textContent = '0';
+                    badgeCount.textContent = '0 ocorrências';
+                    badgeCount.classList.remove('active');
+                    return;
+                }
 
-    const locations = [
-      { name:'Mercado Abandonado', desc:'Prateleiras vazias, lixo.', loot:[3,8], danger:0.3 },
-      { name:'Ruas Desertas', desc:'Asfalto rachado.', loot:[1,5], danger:0.15 },
-      { name:'Campo de Lixo', desc:'Montanhas de detritos.', loot:[5,15], danger:0.4 },
-      { name:'Esgoto', desc:'Úmido e escuro.', loot:[2,6], danger:0.25 },
-      { name:'Prédios Antigos', desc:'Concreto desabado.', loot:[4,10], danger:0.35 },
-      { name:'Metrô', desc:'Túneis silenciosos.', loot:[3,9], danger:0.3 }
-    ];
+                const term = searchTerm.trim();
+                // Escapa caracteres regex
+                const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(escaped, 'gi');
 
-    function generateSurfaceChoices() {
-      const choicesDiv = document.getElementById('surfaceChoices');
-      choicesDiv.innerHTML = '';
-      const pool = ['comer','dormir','descansar','sucata','irlocal'];
-      const shuffled = pool.sort(()=>Math.random()-0.5).slice(0,3);
+                let matchCountNum = 0;
+                const highlighted = text.replace(regex, (match) => {
+                    matchCountNum++;
+                    return `<mark>${match}</mark>`;
+                });
 
-      shuffled.forEach(action=>{
-        const btn = document.createElement('button');
-        btn.className = 'choice-btn';
-        switch(action) {
-          case 'comer':
-            if(S.inventory.food<=0) { btn.classList.add('btn-disabled'); btn.textContent='🍞 Sem rações'; }
-            else { btn.textContent='🍞 Comer ração (-fome, +energia)'; btn.onclick=()=>actionEat(); }
-            break;
-          case 'dormir':
-            btn.textContent='💤 Dormir (recupera energia, reduz fome)'; btn.onclick=()=>actionSleep();
-            break;
-          case 'descansar':
-            btn.textContent='🛌 Descansar (+energia)'; btn.onclick=()=>actionRest();
-            break;
-          case 'sucata':
-            btn.textContent='🔍 Procurar Sucatas'; btn.onclick=()=>actionSearch();
-            break;
-          case 'irlocal':
-            btn.textContent='🚶 Ir para local aleatório'; btn.onclick=()=>actionGoLocation();
-            break;
-        }
-        choicesDiv.appendChild(btn);
-      });
-      if(S.turn>=7) {
-        const retBtn = document.createElement('button');
-        retBtn.className='choice-btn btn-special';
-        retBtn.textContent='🏠 Voltar ao Bunker'; retBtn.onclick=()=>{ addLog('Retornando...'); returnToBunker(); };
-        choicesDiv.appendChild(retBtn);
-      }
-    }
+                preview.innerHTML = highlighted;
+                matchCount.textContent = matchCountNum;
 
-    function actionEat() {
-      if(S.inventory.food<=0) return;
-      S.inventory.food--;
-      S.hunger = Math.max(0, S.hunger-40);
-      S.energy = Math.min(S.maxEnergy, S.energy+20);
-      addLog('🍞 Ração consumida.','success');
-      nextTurn();
-    }
-    function actionSleep() {
-      let rec = Math.floor(Math.random()*16)+30;
-      S.energy = Math.min(S.maxEnergy, S.energy+rec);
-      S.hunger = Math.max(0, S.hunger-15);
-      addLog(`💤 Dormiu. +${rec} energia.`);
-      nextTurn();
-    }
-    function actionRest() {
-      let rec = Math.floor(Math.random()*11)+20;
-      S.energy = Math.min(S.maxEnergy, S.energy+rec);
-      addLog(`🛌 Descansou. +${rec} energia.`);
-      nextTurn();
-    }
-    function actionSearch() {
-      S.energy-=12; S.hunger+=8;
-      addLog('🔍 Vasculhando...');
-      if(checkGameOver()) return;
-      if(Math.random()<0.4) { addLog('⚠️ Mutante!','danger'); startCombat(); return; }
-      let amount = Math.floor(Math.random()*5)+2; S.scrap+=amount;
-      addLog(`Encontrou ${amount} sucatas.`,'success');
-      nextTurn();
-    }
-    function actionGoLocation() {
-      S.energy-=8; S.hunger+=5;
-      if(checkGameOver()) return;
-      let loc = locations[Math.floor(Math.random()*locations.length)];
-      addLog(`📍 ${loc.name}: ${loc.desc}`);
-      if(Math.random()<loc.danger) { addLog('Mutante no local!','danger'); startCombat(); return; }
-      let amount = Math.floor(Math.random()*(loc.loot[1]-loc.loot[0]+1))+loc.loot[0];
-      S.scrap+=amount; addLog(`Coletou ${amount} sucatas.`);
-      nextTurn();
-    }
+                if (matchCountNum > 0) {
+                    badgeCount.textContent = `${matchCountNum} ocorrência${matchCountNum > 1 ? 's' : ''}`;
+                    badgeCount.classList.add('active');
+                } else {
+                    badgeCount.textContent = '0 ocorrências';
+                    badgeCount.classList.remove('active');
+                    if (text) {
+                        // mostra mensagem "nenhuma coincidência" de forma sutil
+                        // mas mantém o texto visível
+                    }
+                }
+            }
 
-    function startCombat() {
-      S.mutantWounded = false;
-      S.mutantHp = Math.floor(Math.random()*21)+30;
-      document.getElementById('combatDesc').textContent = 'Um mutante avança!';
-      document.getElementById('combatStats').innerHTML = combatStatsHTML();
-      showScreen('combat','combat');
-      renderCombatChoices();
-    }
-    function renderCombatChoices() {
-      const div = document.getElementById('combatChoices'); div.innerHTML = '';
-      const atkBtn = document.createElement('button'); atkBtn.className='choice-btn';
-      atkBtn.textContent='⚔️ Atacar (10-25 dano)'; atkBtn.onclick=()=>combatAction('attack'); div.appendChild(atkBtn);
-      const defBtn = document.createElement('button'); defBtn.className='choice-btn';
-      defBtn.textContent='🛡️ Defender'; defBtn.onclick=()=>combatAction('defend'); div.appendChild(defBtn);
-      const fleeChance = S.mutantWounded ? 0.75 : 0.50;
-      const fleeBtn = document.createElement('button'); fleeBtn.className='choice-btn';
-      fleeBtn.textContent=`🏃 Fugir (${Math.round(fleeChance*100)}%)`; fleeBtn.onclick=()=>combatAction('flee'); div.appendChild(fleeBtn);
-      if(S.inventory.grenade>0) {
-        const grBtn = document.createElement('button'); grBtn.className='choice-btn btn-special';
-        grBtn.textContent='💣 Granada (fuga certa)'; grBtn.onclick=()=>{ S.inventory.grenade--; addLog('Granada!'); endCombat(true); };
-        div.appendChild(grBtn);
-      }
-    }
-    function combatAction(type) {
-      if(type==='attack') {
-        if(Math.random()<0.3) addLog('Errou!','danger');
-        else {
-          let dmg = Math.floor(Math.random()*16)+10; S.mutantHp-=dmg; S.mutantWounded=true;
-          addLog(`Acertou ${dmg} dano.`); if(S.mutantHp<=0) { addLog('Mutante abatido!'); S.scrap+=5; endCombat(true); return; }
-        }
-        let enemyDmg = Math.floor(Math.random()*11)+5; S.hp-=enemyDmg; addLog(`Mutante revida ${enemyDmg}.`,'danger');
-      } else if(type==='defend') {
-        let roll = Math.random(); let enemyDmg = Math.floor(Math.random()*11)+5;
-        if(roll<0.7) addLog('Defesa total!'); else if(roll<0.9) { let d=Math.floor(enemyDmg/2); S.hp-=d; addLog(`Defesa parcial -${d}.`); }
-        else { S.hp-=enemyDmg; addLog(`Falha -${enemyDmg}.`,'danger'); }
-      } else if(type==='flee') {
-        let chance = S.mutantWounded?0.75:0.50;
-        if(Math.random()<chance) { addLog('Fugiu!'); S.energy-=10; endCombat(true); return; }
-        else { let dmg=Math.floor(Math.random()*11)+5; S.hp-=dmg; addLog('Fuga falhou!','danger'); }
-      }
-      if(S.hp<=0) { S.hp=0; endCombat(false); return; }
-      document.getElementById('combatStats').innerHTML = combatStatsHTML();
-      renderCombatChoices();
-    }
-    function endCombat(survived) {
-      showScreen('surface','surface');
-      document.getElementById('surfaceStats').innerHTML = surfaceStatsHTML();
-      if(!survived) loseExpedition();
-      else { addLog('Confronto encerrado.'); nextTurn(); }
-    }
+            // ── Atualizar tudo ──
+            function refreshAll() {
+                const text = getPlainText();
+                lastPlainText = text;
+                updateStats(text);
+                renderPreview(text, currentSearchTerm);
+            }
 
-    function renderBunkerShop() {
-      const div = document.getElementById('bunkerActions'); div.innerHTML = '';
-      const items = [
-        { name:'Ração', key:'food', cost:5 },
-        { name:'Kit Médico', key:'medkit', cost:10 },
-        { name:'Sensor', key:'sensor', cost:15 },
-        { name:'Granada', key:'grenade', cost:20 },
-        { name:'Sementes', key:'seeds', cost:30 },
-        { name:'Upgrade Traje', key:'suit', cost:50 },
-      ];
-      items.forEach(it=>{
-        const btn = document.createElement('button'); btn.className='choice-btn';
-        btn.textContent = `${it.name} (${it.cost}💰)`;
-        if(S.coins<it.cost) btn.classList.add('btn-disabled');
-        btn.onclick = ()=>{
-          if(S.coins>=it.cost) {
-            S.coins-=it.cost;
-            if(it.key==='suit') { S.suitLvl++; S.maxTurns = 10 + S.suitLvl*2; }
-            else S.inventory[it.key]++;
-            document.getElementById('bunkerInfo').innerHTML = `🔋 Vida ${S.hp}/${S.maxHp} · 💰 ${S.coins} moedas`;
-            renderBunkerShop();
-          }
-        };
-        div.appendChild(btn);
-      });
-    }
+            // ── Buscar ──
+            function performSearch() {
+                const term = searchInput.value.trim();
+                currentSearchTerm = term;
+                const text = getPlainText();
+                if (!text) {
+                    showToast('Digite ou cole um texto primeiro.', 1500);
+                    return;
+                }
+                if (!term) {
+                    showToast('Digite uma palavra para buscar.', 1200);
+                    renderPreview(text, '');
+                    return;
+                }
+                renderPreview(text, term);
+                if (matchCount.textContent === '0') {
+                    showToast(`"${term}" não encontrado.`, 1500);
+                } else {
+                    showToast(`Encontrado ${matchCount.textContent} ocorrência${matchCount.textContent > 1 ? 's' : ''} de "${term}".`, 1800);
+                }
+            }
 
-    // INVENTÁRIO MELHORADO
-    function openInventory() {
-      S.previousScreen = S.currentScreen;
-      const invDiv = document.getElementById('invContent');
-      let html = `<p>💰 Moedas: ${S.coins} | 📦 Sucata na mão: ${S.scrap}</p>`;
-      html += `<div class="inv-item-row"><span>🍞 Rações</span> <span>${S.inventory.food}</span> ${S.inventory.food>0 && S.currentScreen==='surface' ? '<button class="inv-use-btn" id="useFoodBtn">Usar</button>' : ''}</div>`;
-      html += `<div class="inv-item-row"><span>💊 Kits Médicos</span> <span>${S.inventory.medkit}</span> ${S.inventory.medkit>0 && S.currentScreen==='surface' ? '<button class="inv-use-btn" id="useMedkitBtn">Usar</button>' : ''}</div>`;
-      html += `<div class="inv-item-row"><span>📡 Sensores</span> <span>${S.inventory.sensor}</span></div>`;
-      html += `<div class="inv-item-row"><span>💣 Granadas</span> <span>${S.inventory.grenade}</span></div>`;
-      html += `<div class="inv-item-row"><span>🌱 Sementes</span> <span>${S.inventory.seeds}</span></div>`;
-      html += `<p style="margin-top:12px;">🛡️ Traje nível ${S.suitLvl} (Turnos ${10+S.suitLvl*2})</p>`;
-      invDiv.innerHTML = html;
+            // ── Trocar ──
+            function performReplace() {
+                const searchTerm = searchInput.value.trim();
+                const replaceTerm = replaceInput.value.trim();
 
-      // Botões de uso dentro do inventário (superfície)
-      if(S.currentScreen==='surface') {
-        const useFood = document.getElementById('useFoodBtn');
-        const useMedkit = document.getElementById('useMedkitBtn');
-        if(useFood) useFood.onclick = ()=>{
-          if(S.inventory.food>0) {
-            S.inventory.food--;
-            S.hunger = Math.max(0, S.hunger-40);
-            S.energy = Math.min(S.maxEnergy, S.energy+20);
-            addLog('🍞 Ração usada do inventário.','success');
-            openInventory(); // refresh
-            document.getElementById('surfaceStats').innerHTML = surfaceStatsHTML();
-          }
-        };
-        if(useMedkit) useMedkit.onclick = ()=>{
-          if(S.inventory.medkit>0 && S.hp<S.maxHp) {
-            S.inventory.medkit--;
-            S.hp = Math.min(S.maxHp, S.hp+25);
-            addLog('💊 Kit médico usado. +25 Vida.','success');
-            openInventory();
-            document.getElementById('surfaceStats').innerHTML = surfaceStatsHTML();
-          }
-        };
-      }
+                if (!getPlainText()) {
+                    showToast('Digite ou cole um texto primeiro.', 1500);
+                    return;
+                }
 
-      showScreen('inventory','inventory');
-    }
+                if (!searchTerm) {
+                    showToast('Digite a palavra que deseja trocar.', 1200);
+                    return;
+                }
 
-    document.getElementById('startGameBtn').addEventListener('click', ()=>{
-      S.name = document.getElementById('nameInput').value.trim() || 'Ascensor';
-      S.hp=100; S.energy=100; S.hunger=0; S.vegetation=0; S.coins=0; S.suitLvl=0; S.maxTurns=10;
-      S.inventory = { food:3, medkit:1, sensor:0, grenade:0, seeds:0 };
-      updateVegUI();
-      document.getElementById('bunkerInfo').innerHTML = `Bem-vindo, <strong>${S.name}</strong>.`;
-      renderBunkerShop();
-      showScreen('bunker','bunker');
-    });
-    document.getElementById('goSurfaceBtn').addEventListener('click', ()=>{
-      clearLog(); S.scrap=0; S.turn=1;
-      document.getElementById('surfaceStats').innerHTML = surfaceStatsHTML();
-      showScreen('surface','surface');
-      addLog('Superfície. Ar pesado.');
-      generateSurfaceChoices();
-    });
-    document.getElementById('openInventoryBtn').addEventListener('click', openInventory);
-    document.getElementById('closeInvBtn').addEventListener('click', ()=>{
-      if(S.previousScreen==='surface') {
-        showScreen('surface','surface');
-        document.getElementById('surfaceStats').innerHTML = surfaceStatsHTML();
-      } else {
-        showScreen('bunker','bunker');
-      }
-    });
-  })();
-</script>
+                // Se replaceTerm estiver vazio, substitui por string vazia (remove)
+                const text = getPlainText();
+                const escaped = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(escaped, 'gi');
+
+                const matches = text.match(regex);
+                if (!matches) {
+                    showToast(`"${searchTerm}" não encontrado.`, 1500);
+                    return;
+                }
+
+                const count = matches.length;
+                const newText = text.replace(regex, replaceTerm);
+                editor.value = newText;
+                currentSearchTerm = searchTerm; // mantém a busca
+                refreshAll();
+
+                // Re-aplica o highlight com o termo atual
+                renderPreview(newText, currentSearchTerm);
+
+                const msg = replaceTerm ?
+                    `Trocou ${count} ocorrência${count > 1 ? 's' : ''} de "${searchTerm}" por "${replaceTerm}".` :
+                    `Removeu ${count} ocorrência${count > 1 ? 's' : ''} de "${searchTerm}".`;
+                showToast(msg, 2200);
+            }
+
+            // ── Limpar tudo ──
+            function clearAll() {
+                editor.value = '';
+                searchInput.value = '';
+                replaceInput.value = '';
+                currentSearchTerm = '';
+                refreshAll();
+                badgeCount.classList.remove('active');
+                showToast('Texto limpo.', 1000);
+            }
+
+            // ── Limpar destaques (volta ao texto puro no preview) ──
+            function clearHighlights() {
+                const text = getPlainText();
+                currentSearchTerm = '';
+                searchInput.value = '';
+                renderPreview(text, '');
+                badgeCount.classList.remove('active');
+                showToast('Destaques removidos.', 1000);
+            }
+
+            // ── Eventos ──
+            editor.addEventListener('input', refreshAll);
+
+            btnSearch.addEventListener('click', performSearch);
+
+            btnReplace.addEventListener('click', performReplace);
+
+            btnClear.addEventListener('click', clearAll);
+
+            btnClearHighlights.addEventListener('click', clearHighlights);
+
+            // Enter nos campos
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    btnSearch.click();
+                }
+            });
+
+            replaceInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    btnReplace.click();
+                }
+            });
+
+            // Ctrl+Shift+F / Ctrl+F no editor (redireciona para busca)
+            editor.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                    e.preventDefault();
+                    searchInput.focus();
+                    searchInput.select();
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+                    e.preventDefault();
+                    replaceInput.focus();
+                    replaceInput.select();
+                }
+            });
+
+            // ── Inicialização ──
+            refreshAll();
+
+            // Exemplo com o texto do usuário (pré-carregado)
+            const exemplo = `Admiração é o prelúdio da frustração
+            Um sonho compartilhado entre eu e meu irmão
+            Ser o melhor atacante, essa era nossa missão
+            Desde que você voltou da Europa, eu não consigo reconhecer essa visão`;
+
+            editor.value = exemplo;
+            refreshAll();
+
+            // Sincroniza o placeholder do preview
+            showToast('📝 Pronto! Cole um texto e use Buscar / Trocar.', 2500);
+
+        })();
+    </script>
+
 </body>
 </html>
