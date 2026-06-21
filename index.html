@@ -1,814 +1,347 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bloco de Notas · Buscar & Trocar</title>
-    <style>
-        /* ── Reset & Base ── */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #0b0d10;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 1.5rem;
-        }
-
-        .app {
-            max-width: 920px;
-            width: 100%;
-            background: #14171c;
-            border-radius: 28px;
-            padding: 2rem 2rem 1.8rem;
-            box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.8),
-                inset 0 1px 1px rgba(255, 255, 255, 0.04);
-            transition: box-shadow 0.3s;
-        }
-
-        /* ── Cabeçalho ── */
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-            user-select: none;
-        }
-
-        .header h1 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #e8edf2;
-            letter-spacing: -0.3px;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .header h1 span {
-            background: #2a2f36;
-            padding: 0.15rem 0.65rem;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            color: #8896a6;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-        }
-
-        .badge-count {
-            margin-left: auto;
-            background: #1e2329;
-            padding: 0.25rem 1rem;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            color: #8896a6;
-            border: 1px solid #282f36;
-            transition: all 0.25s;
-        }
-
-        .badge-count.active {
-            background: #1e2a2f;
-            border-color: #3d6b7a;
-            color: #7fc1d4;
-        }
-
-        /* ── Área de texto ── */
-        .editor-wrap {
-            position: relative;
-            border-radius: 16px;
-            background: #0e1115;
-            border: 1px solid #232a30;
-            transition: border-color 0.25s;
-            margin-bottom: 1.2rem;
-        }
-
-        .editor-wrap:focus-within {
-            border-color: #3d6b7a;
-            box-shadow: 0 0 0 3px rgba(61, 107, 122, 0.15);
-        }
-
-        #editor {
-            width: 100%;
-            min-height: 260px;
-            max-height: 460px;
-            padding: 1.2rem 1.4rem;
-            font-size: 0.95rem;
-            line-height: 1.7;
-            color: #d6dee6;
-            background: transparent;
-            border: none;
-            outline: none;
-            resize: vertical;
-            font-family: 'Segoe UI', 'SF Mono', 'Cascadia Code', monospace;
-            letter-spacing: 0.2px;
-            tab-size: 2;
-        }
-
-        #editor::placeholder {
-            color: #3f484f;
-            font-weight: 300;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        /* ── Preview com highlights ── */
-        .preview-wrap {
-            border-radius: 16px;
-            background: #0e1115;
-            border: 1px solid #1e2429;
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-            transition: border-color 0.25s;
-        }
-
-        .preview-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.5rem 1.2rem;
-            background: #12171c;
-            border-bottom: 1px solid #1e2429;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #5a6877;
-        }
-
-        .preview-header .hint {
-            color: #3a4855;
-            font-size: 0.65rem;
-        }
-
-        #preview {
-            padding: 1.2rem 1.4rem;
-            min-height: 80px;
-            max-height: 220px;
-            overflow-y: auto;
-            font-size: 0.95rem;
-            line-height: 1.7;
-            color: #bcc9d6;
-            font-family: 'Segoe UI', 'SF Mono', 'Cascadia Code', monospace;
-            white-space: pre-wrap;
-            word-break: break-word;
-            scroll-behavior: smooth;
-        }
-
-        #preview mark {
-            background: #d4a13e;
-            color: #0b0d10;
-            padding: 0.1rem 0.15rem;
-            border-radius: 4px;
-            font-weight: 600;
-            box-shadow: 0 0 0 1px rgba(212, 161, 62, 0.3);
-            transition: background 0.15s;
-        }
-
-        #preview .empty-hint {
-            color: #3a4855;
-            font-style: italic;
-            font-weight: 300;
-        }
-
-        /* ── Controles ── */
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            align-items: flex-end;
-            margin-bottom: 1.2rem;
-        }
-
-        .control-group {
-            flex: 1 1 200px;
-            min-width: 140px;
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-        }
-
-        .control-group label {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: #5a6877;
-            font-weight: 600;
-        }
-
-        .control-group .input-row {
-            display: flex;
-            gap: 0.4rem;
-        }
-
-        .control-group input {
-            flex: 1;
-            padding: 0.55rem 0.9rem;
-            border-radius: 10px;
-            border: 1px solid #232a30;
-            background: #0e1115;
-            color: #d6dee6;
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            min-width: 0;
-        }
-
-        .control-group input::placeholder {
-            color: #3f484f;
-            font-weight: 300;
-        }
-
-        .control-group input:focus {
-            border-color: #3d6b7a;
-            box-shadow: 0 0 0 3px rgba(61, 107, 122, 0.12);
-        }
-
-        .btn {
-            padding: 0.55rem 1.1rem;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            background: #232a30;
-            color: #bcc9d6;
-            border: 1px solid transparent;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            filter: brightness(1.08);
-        }
-
-        .btn:active {
-            transform: translateY(0px);
-            filter: brightness(0.92);
-        }
-
-        .btn-primary {
-            background: #2a5f6e;
-            color: #f0f7fa;
-            border-color: #3a7a8a;
-        }
-
-        .btn-primary:hover {
-            background: #326e7e;
-            border-color: #4a8a9a;
-        }
-
-        .btn-success {
-            background: #2b5e4a;
-            color: #f0f7fa;
-            border-color: #3a7a5a;
-        }
-
-        .btn-success:hover {
-            background: #347a5a;
-            border-color: #4a8a6a;
-        }
-
-        .btn-danger {
-            background: #5e2e2e;
-            color: #f0f0f0;
-            border-color: #7a3a3a;
-        }
-
-        .btn-danger:hover {
-            background: #6e3a3a;
-            border-color: #8a4a4a;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border-color: #2a323a;
-            color: #7a8a9a;
-        }
-
-        .btn-outline:hover {
-            border-color: #4a5a6a;
-            color: #bcc9d6;
-            background: #1a1f24;
-        }
-
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none !important;
-            filter: none !important;
-        }
-
-        /* ── Status / rodapé ── */
-        .status-bar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            padding-top: 0.8rem;
-            border-top: 1px solid #1a1f24;
-            font-size: 0.8rem;
-            color: #5a6877;
-            gap: 0.5rem;
-        }
-
-        .status-bar .stats {
-            display: flex;
-            gap: 1.2rem;
-            flex-wrap: wrap;
-        }
-
-        .status-bar .stats span {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        .status-bar .stats .num {
-            color: #bcc9d6;
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
-            min-width: 1.8rem;
-        }
-
-        .status-bar .actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn-sm {
-            padding: 0.2rem 0.7rem;
-            font-size: 0.7rem;
-            border-radius: 6px;
-            background: #1a1f24;
-            color: #7a8a9a;
-            border: 1px solid #232a30;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .btn-sm:hover {
-            background: #232a30;
-            color: #bcc9d6;
-        }
-
-        /* ── Scrollbar ── */
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #0e1115;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #2a323a;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3a4a5a;
-        }
-
-        /* ── Responsive ── */
-        @media (max-width: 640px) {
-            .app {
-                padding: 1.2rem 1rem 1rem;
-                border-radius: 20px;
-            }
-
-            .header h1 {
-                font-size: 1rem;
-            }
-
-            .controls {
-                flex-direction: column;
-                gap: 0.6rem;
-            }
-
-            .control-group {
-                flex: 1 1 auto;
-                min-width: 0;
-                width: 100%;
-            }
-
-            .control-group .input-row {
-                flex-wrap: wrap;
-            }
-
-            .control-group .input-row input {
-                flex: 1 1 120px;
-            }
-
-            .btn {
-                padding: 0.45rem 0.9rem;
-                font-size: 0.8rem;
-                flex: 1;
-                justify-content: center;
-            }
-
-            #editor {
-                min-height: 180px;
-                padding: 0.9rem 1rem;
-                font-size: 0.9rem;
-            }
-
-            #preview {
-                min-height: 60px;
-                padding: 0.9rem 1rem;
-                font-size: 0.9rem;
-            }
-
-            .status-bar {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.5rem;
-            }
-
-            .status-bar .actions {
-                justify-content: flex-end;
-            }
-
-            .badge-count {
-                font-size: 0.65rem;
-                padding: 0.15rem 0.7rem;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .header h1 span {
-                display: none;
-            }
-
-            .btn {
-                font-size: 0.7rem;
-                padding: 0.35rem 0.6rem;
-            }
-
-            .control-group input {
-                font-size: 0.8rem;
-                padding: 0.4rem 0.6rem;
-            }
-        }
-
-        /* ── Animação de destaque ── */
-        @keyframes flash-highlight {
-            0% {
-                background: #d4a13e;
-                color: #0b0d10;
-            }
-            100% {
-                background: #d4a13e;
-                color: #0b0d10;
-            }
-        }
-
-        #preview mark.flash {
-            animation: flash-highlight 0.6s ease 2;
-        }
-
-        /* ── Tooltip ── */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: #1a1f24;
-            color: #d6dee6;
-            padding: 0.6rem 1.6rem;
-            border-radius: 40px;
-            border: 1px solid #2a323a;
-            font-size: 0.85rem;
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-            pointer-events: none;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-            z-index: 999;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hollow: Devorar ou Ser Devorado</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0a0a;
+      color: #ccc;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    #game {
+      max-width: 550px;
+      width: 100%;
+      background: #1a1a1a;
+      border: 2px solid #444;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 20px #00000088;
+    }
+    h2, h3 { color: #cc3333; }
+    button {
+      background: #2a2a2a;
+      color: #ddd;
+      border: 1px solid #555;
+      padding: 8px 14px;
+      margin: 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    button:hover { background: #3a3a3a; border-color: #cc3333; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .bar-container {
+      background: #222;
+      border-radius: 4px;
+      height: 20px;
+      width: 100%;
+      margin: 5px 0;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 100%;
+      background: #cc3333;
+      transition: width 0.2s;
+    }
+    .bar-fill.green { background: #33aa33; }
+    .bar-fill.blue { background: #3377cc; }
+    .log {
+      background: #111;
+      border: 1px solid #333;
+      padding: 10px;
+      margin: 15px 0;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 0.9em;
+      color: #aaa;
+    }
+    .log p { margin: 3px 0; }
+    .highlight { color: #ff8800; font-weight: bold; }
+    .evolucao { color: #ffcc00; font-weight: bold; font-size: 1.2em; }
+    #start-screen, #game-screen, #combat-screen { display: none; }
+    #game-screen.active, #start-screen.active, #combat-screen.active { display: block; }
+    #player-stats, #enemy-stats { margin: 10px 0; }
+  </style>
 </head>
 <body>
+<div id="game">
+  <!-- Tela inicial -->
+  <div id="start-screen" class="active">
+    <h2>🌑 Hueco Mundo</h2>
+    <p>Você é um Hollow faminto. Caçe, devore e evolua.</p>
+    <input type="text" id="name-input" placeholder="Nome do Hollow" maxlength="12">
+    <button id="start-btn">Iniciar Caçada</button>
+  </div>
 
-    <div class="app">
-        <!-- Cabeçalho -->
-        <div class="header">
-            <h1>
-                📝 Bloco de Notas
-                <span>Buscar &amp; Trocar</span>
-            </h1>
-            <div class="badge-count" id="badgeCount">0 ocorrências</div>
-        </div>
+  <!-- Tela principal (overworld) -->
+  <div id="game-screen">
+    <div id="player-stats"></div>
+    <button id="hunt-btn">🔪 Caçar Hollow</button>
+    <button id="rest-btn">💤 Descansar (cura 40%)</button>
+    <div class="log" id="log"></div>
+  </div>
 
-        <!-- Editor -->
-        <div class="editor-wrap">
-            <textarea id="editor" placeholder="Digite ou cole seu texto aqui…" spellcheck="true"></textarea>
-        </div>
+  <!-- Tela de combate -->
+  <div id="combat-screen">
+    <h3>⚔️ Combate</h3>
+    <div id="enemy-stats"></div>
+    <hr>
+    <div id="player-stats-combat"></div>
+    <div id="combat-actions"></div>
+    <div class="log" id="combat-log"></div>
+  </div>
+</div>
 
-        <!-- Controles -->
-        <div class="controls">
-            <!-- Buscar -->
-            <div class="control-group">
-                <label for="searchInput">🔍 Procurar</label>
-                <div class="input-row">
-                    <input type="text" id="searchInput" placeholder="Palavra…" />
-                    <button class="btn btn-primary" id="btnSearch">Buscar</button>
-                </div>
-            </div>
+<script>
+  (function() {
+    // -------------------- Configuração das formas --------------------
+    const FORMS = {
+      "Hollow Comum": { hp: 30, atk: 6, def: 2, xpNeeded: 20, abilities: ["Garra", "Mordida"] },
+      "Menos Grande": { hp: 60, atk: 12, def: 5, xpNeeded: 60, abilities: ["Garra", "Mordida", "Cero Bruto"] },
+      "Adjucha":      { hp: 40, atk: 18, def: 8, xpNeeded: 150, abilities: ["Garra", "Mordida", "Cero Rápido", "Regeneração"] },
+      "Vasto Lorde":  { hp: 70, atk: 28, def: 14, xpNeeded: Infinity, abilities: ["Garra", "Mordida", "Gran Rey Cero", "Hierro", "Sonido"] }
+    };
 
-            <!-- Trocar -->
-            <div class="control-group">
-                <label for="replaceInput">🔄 Trocar por</label>
-                <div class="input-row">
-                    <input type="text" id="replaceInput" placeholder="Nova palavra…" />
-                    <button class="btn btn-success" id="btnReplace">Trocar</button>
-                </div>
-            </div>
-        </div>
+    // -------------------- Classe Hollow --------------------
+    class Hollow {
+      constructor(name, form = "Hollow Comum", xp = 0, isEnemy = false) {
+        this.name = name;
+        this.form = form;
+        this.xp = xp;
+        this.isEnemy = isEnemy;
+        const stats = FORMS[form];
+        this.maxHp = stats.hp;
+        this.hp = this.maxHp;
+        this.atk = stats.atk;
+        this.def = stats.def;
+        this.xpNeeded = stats.xpNeeded;
+        this.abilities = [...stats.abilities];
+      }
 
-        <!-- Preview com destaques -->
-        <div class="preview-wrap">
-            <div class="preview-header">
-                <span>📋 Visualização com destaque</span>
-                <span class="hint">as ocorrências aparecem em <strong style="color:#d4a13e;">amarelo</strong></span>
-            </div>
-            <div id="preview">
-                <span class="empty-hint">Nenhum texto para exibir. Digite ou cole algo no campo acima.</span>
-            </div>
-        </div>
+      isAlive() { return this.hp > 0; }
 
-        <!-- Status -->
-        <div class="status-bar">
-            <div class="stats">
-                <span>📄 <span class="num" id="charCount">0</span> caracteres</span>
-                <span>📝 <span class="num" id="wordCount">0</span> palavras</span>
-                <span>🎯 <span class="num" id="matchCount">0</span> coincidências</span>
-            </div>
-            <div class="actions">
-                <button class="btn-sm" id="btnClear" title="Limpar tudo">🗑️ Limpar</button>
-                <button class="btn-sm" id="btnClearHighlights" title="Remover destaques">✨ Limpar destaques</button>
-            </div>
-        </div>
-    </div>
+      attack(target, ability = "Garra") {
+        let baseDmg = this.atk - target.def;
+        if (baseDmg < 1) baseDmg = 1;
+        let dmg = baseDmg;
+        if (ability.includes("Cero")) dmg = Math.floor(baseDmg * 1.6);
+        if (ability === "Gran Rey Cero") dmg = Math.floor(baseDmg * 2.2);
+        if (ability === "Regeneração") {
+          const heal = Math.floor(this.maxHp * 0.2);
+          this.hp = Math.min(this.maxHp, this.hp + heal);
+          return { dmg: 0, msg: `${this.name} usou Regeneração e recuperou ${heal} de HP.` };
+        }
+        target.hp -= dmg;
+        return { dmg, msg: `${this.name} atacou com ${ability} e causou ${dmg} de dano.` };
+      }
 
-    <!-- Toast -->
-    <div class="toast" id="toast"></div>
+      eat(prey) {
+        const gain = prey.xp + Math.floor(Math.random() * 15) + 5;
+        this.xp += gain;
+        const msg = `Você devorou ${prey.name} e ganhou ${gain} de XP. (Total: ${this.xp}/${this.xpNeeded})`;
+        this.checkEvolution();
+        return msg;
+      }
 
-    <script>
-        (function() {
-            'use strict';
+      checkEvolution() {
+        if (this.form === "Hollow Comum" && this.xp >= 20) {
+          this.evolve("Menos Grande");
+        } else if (this.form === "Menos Grande" && this.xp >= 60) {
+          this.evolve("Adjucha");
+        } else if (this.form === "Adjucha" && this.xp >= 150) {
+          this.evolve("Vasto Lorde");
+        }
+      }
 
-            // ── DOM refs ──
-            const editor = document.getElementById('editor');
-            const preview = document.getElementById('preview');
-            const searchInput = document.getElementById('searchInput');
-            const replaceInput = document.getElementById('replaceInput');
-            const btnSearch = document.getElementById('btnSearch');
-            const btnReplace = document.getElementById('btnReplace');
-            const btnClear = document.getElementById('btnClear');
-            const btnClearHighlights = document.getElementById('btnClearHighlights');
-            const badgeCount = document.getElementById('badgeCount');
-            const charCount = document.getElementById('charCount');
-            const wordCount = document.getElementById('wordCount');
-            const matchCount = document.getElementById('matchCount');
-            const toast = document.getElementById('toast');
+      evolve(newForm) {
+        this.form = newForm;
+        const s = FORMS[newForm];
+        this.maxHp = s.hp;
+        this.hp = this.maxHp;
+        this.atk = s.atk;
+        this.def = s.def;
+        this.xpNeeded = s.xpNeeded;
+        this.abilities = [...s.abilities];
+        addLog(`🌟 EVOLUÇÃO! Agora você é um ${newForm}!`, 'evolucao');
+      }
+    }
 
-            // ── Estado ──
-            let currentSearchTerm = '';
-            let lastPlainText = '';
+    // -------------------- Geração de inimigos --------------------
+    function generateEnemy(playerLevel) {
+      let form;
+      if (playerLevel === 0) form = Math.random() < 0.85 ? "Hollow Comum" : "Menos Grande";
+      else if (playerLevel === 1) form = Math.random() < 0.6 ? "Menos Grande" : "Adjucha";
+      else if (playerLevel === 2) form = Math.random() < 0.7 ? "Adjucha" : "Vasto Lorde";
+      else form = "Vasto Lorde";
+      const names = ["Rastejante", "Uivador", "Devorador", "Sombra Cruel", "Mandíbula", "Garranegra", "Olho Oco"];
+      const name = names[Math.floor(Math.random() * names.length)];
+      const xp = Math.floor(Math.random() * 25) + 5;
+      return new Hollow(name, form, xp, true);
+    }
 
-            // ── Utilitários ──
-            function getPlainText() {
-                return editor.value;
-            }
+    // -------------------- Estado do jogo --------------------
+    let player = null;
+    let currentEnemy = null;
+    const startScreen = document.getElementById('start-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const combatScreen = document.getElementById('combat-screen');
+    const logDiv = document.getElementById('log');
+    const combatLogDiv = document.getElementById('combat-log');
 
-            function updateStats(text) {
-                const len = text.length;
-                const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-                charCount.textContent = len;
-                wordCount.textContent = words;
-            }
+    function addLog(msg, cls = '') {
+      const p = document.createElement('p');
+      if (cls) p.className = cls;
+      p.textContent = msg;
+      logDiv.appendChild(p);
+      combatLogDiv.appendChild(p.cloneNode(true));
+      logDiv.scrollTop = logDiv.scrollHeight;
+      combatLogDiv.scrollTop = combatLogDiv.scrollHeight;
+    }
 
-            function showToast(msg, duration = 2000) {
-                toast.textContent = msg;
-                toast.classList.add('show');
-                clearTimeout(toast._timer);
-                toast._timer = setTimeout(() => {
-                    toast.classList.remove('show');
-                }, duration);
-            }
+    function clearLogs() {
+      logDiv.innerHTML = '';
+      combatLogDiv.innerHTML = '';
+    }
 
-            // ── Highlight no preview ──
-            function renderPreview(text, searchTerm) {
-                if (!text) {
-                    preview.innerHTML = `<span class="empty-hint">Nenhum texto para exibir. Digite ou cole algo no campo acima.</span>`;
-                    matchCount.textContent = '0';
-                    badgeCount.textContent = '0 ocorrências';
-                    badgeCount.classList.remove('active');
-                    return;
-                }
+    function showScreen(screen) {
+      startScreen.classList.remove('active');
+      gameScreen.classList.remove('active');
+      combatScreen.classList.remove('active');
+      screen.classList.add('active');
+    }
 
-                if (!searchTerm || searchTerm.trim() === '') {
-                    // sem busca: mostra texto puro
-                    preview.textContent = text;
-                    matchCount.textContent = '0';
-                    badgeCount.textContent = '0 ocorrências';
-                    badgeCount.classList.remove('active');
-                    return;
-                }
+    function updatePlayerStats(containerId = 'player-stats') {
+      const container = document.getElementById(containerId);
+      container.innerHTML = `
+        <strong>${player.name}</strong> [${player.form}]<br>
+        HP: ${player.hp}/${player.maxHp} 
+        <div class="bar-container"><div class="bar-fill green" style="width:${(player.hp/player.maxHp)*100}%"></div></div>
+        ATK: ${player.atk} | DEF: ${player.def} | XP: ${player.xp}/${player.xpNeeded}
+        <br>Habilidades: ${player.abilities.join(', ')}
+      `;
+    }
 
-                const term = searchTerm.trim();
-                // Escapa caracteres regex
-                const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const regex = new RegExp(escaped, 'gi');
+    function updateEnemyStats() {
+      const container = document.getElementById('enemy-stats');
+      container.innerHTML = `
+        <strong>${currentEnemy.name}</strong> [${currentEnemy.form}]<br>
+        HP: ${currentEnemy.hp}/${currentEnemy.maxHp}
+        <div class="bar-container"><div class="bar-fill" style="width:${(currentEnemy.hp/currentEnemy.maxHp)*100}%"></div></div>
+      `;
+    }
 
-                let matchCountNum = 0;
-                const highlighted = text.replace(regex, (match) => {
-                    matchCountNum++;
-                    return `<mark>${match}</mark>`;
-                });
+    function setupCombatActions() {
+      const actionsDiv = document.getElementById('combat-actions');
+      actionsDiv.innerHTML = '';
+      player.abilities.forEach(ab => {
+        const btn = document.createElement('button');
+        btn.textContent = ab;
+        btn.addEventListener('click', () => playerTurn(ab));
+        actionsDiv.appendChild(btn);
+      });
+    }
 
-                preview.innerHTML = highlighted;
-                matchCount.textContent = matchCountNum;
+    function startCombat(enemy) {
+      currentEnemy = enemy;
+      showScreen(combatScreen);
+      updatePlayerStats('player-stats-combat');
+      updateEnemyStats();
+      setupCombatActions();
+      combatLogDiv.innerHTML = `<p>Você encontrou ${enemy.name} (${enemy.form})!</p>`;
+    }
 
-                if (matchCountNum > 0) {
-                    badgeCount.textContent = `${matchCountNum} ocorrência${matchCountNum > 1 ? 's' : ''}`;
-                    badgeCount.classList.add('active');
-                } else {
-                    badgeCount.textContent = '0 ocorrências';
-                    badgeCount.classList.remove('active');
-                    if (text) {
-                        // mostra mensagem "nenhuma coincidência" de forma sutil
-                        // mas mantém o texto visível
-                    }
-                }
-            }
+    function endCombat(victory) {
+      if (victory) {
+        const msg = player.eat(currentEnemy);
+        addLog(msg);
+        if (player.form === "Vasto Lorde") {
+          addLog("🌟 Você se tornou um Vasto Lorde! O ápice da existência Hollow. 🌟");
+          alert("Parabéns! Você alcançou o topo da cadeia alimentar! Atualize a página para jogar novamente.");
+          document.getElementById('hunt-btn').disabled = true;
+          document.getElementById('rest-btn').disabled = true;
+        }
+        showScreen(gameScreen);
+        updatePlayerStats();
+      } else {
+        addLog("☠️ Você foi destruído. Sua jornada termina aqui.");
+        alert("Game Over! Atualize a página para tentar novamente.");
+        document.getElementById('hunt-btn').disabled = true;
+        document.getElementById('rest-btn').disabled = true;
+        showScreen(gameScreen);
+      }
+    }
 
-            // ── Atualizar tudo ──
-            function refreshAll() {
-                const text = getPlainText();
-                lastPlainText = text;
-                updateStats(text);
-                renderPreview(text, currentSearchTerm);
-            }
+    function playerTurn(ability) {
+      if (!currentEnemy || !player.isAlive()) return;
+      const result = player.attack(currentEnemy, ability);
+      addLog(result.msg, 'highlight');
+      updateEnemyStats();
+      updatePlayerStats('player-stats-combat');
 
-            // ── Buscar ──
-            function performSearch() {
-                const term = searchInput.value.trim();
-                currentSearchTerm = term;
-                const text = getPlainText();
-                if (!text) {
-                    showToast('Digite ou cole um texto primeiro.', 1500);
-                    return;
-                }
-                if (!term) {
-                    showToast('Digite uma palavra para buscar.', 1200);
-                    renderPreview(text, '');
-                    return;
-                }
-                renderPreview(text, term);
-                if (matchCount.textContent === '0') {
-                    showToast(`"${term}" não encontrado.`, 1500);
-                } else {
-                    showToast(`Encontrado ${matchCount.textContent} ocorrência${matchCount.textContent > 1 ? 's' : ''} de "${term}".`, 1800);
-                }
-            }
+      if (!currentEnemy.isAlive()) {
+        addLog(`${currentEnemy.name} foi derrotado!`);
+        endCombat(true);
+        return;
+      }
 
-            // ── Trocar ──
-            function performReplace() {
-                const searchTerm = searchInput.value.trim();
-                const replaceTerm = replaceInput.value.trim();
+      // Inimigo contra-ataca
+      const enemyAb = currentEnemy.abilities[Math.floor(Math.random() * currentEnemy.abilities.length)];
+      const enemyResult = currentEnemy.attack(player, enemyAb);
+      addLog(enemyResult.msg);
+      updatePlayerStats('player-stats-combat');
+      updateEnemyStats();
 
-                if (!getPlainText()) {
-                    showToast('Digite ou cole um texto primeiro.', 1500);
-                    return;
-                }
+      if (!player.isAlive()) {
+        addLog("Você caiu em combate...");
+        endCombat(false);
+      }
+    }
 
-                if (!searchTerm) {
-                    showToast('Digite a palavra que deseja trocar.', 1200);
-                    return;
-                }
+    function rest() {
+      const heal = Math.floor(player.maxHp * 0.4);
+      player.hp = Math.min(player.maxHp, player.hp + heal);
+      addLog(`Você descansou e recuperou ${heal} de HP.`);
+      updatePlayerStats();
+    }
 
-                // Se replaceTerm estiver vazio, substitui por string vazia (remove)
-                const text = getPlainText();
-                const escaped = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const regex = new RegExp(escaped, 'gi');
+    function hunt() {
+      const levelMap = { "Hollow Comum": 0, "Menos Grande": 1, "Adjucha": 2, "Vasto Lorde": 3 };
+      const level = levelMap[player.form];
+      const enemy = generateEnemy(level);
+      startCombat(enemy);
+    }
 
-                const matches = text.match(regex);
-                if (!matches) {
-                    showToast(`"${searchTerm}" não encontrado.`, 1500);
-                    return;
-                }
+    // -------------------- Inicialização --------------------
+    document.getElementById('start-btn').addEventListener('click', () => {
+      const name = document.getElementById('name-input').value.trim();
+      if (!name) {
+        alert("Escolha um nome para o seu Hollow.");
+        return;
+      }
+      player = new Hollow(name);
+      clearLogs();
+      updatePlayerStats();
+      document.getElementById('hunt-btn').disabled = false;
+      document.getElementById('rest-btn').disabled = false;
+      addLog(`Bem-vindo, ${name}. Que comece a caçada.`);
+      showScreen(gameScreen);
+    });
 
-                const count = matches.length;
-                const newText = text.replace(regex, replaceTerm);
-                editor.value = newText;
-                currentSearchTerm = searchTerm; // mantém a busca
-                refreshAll();
+    document.getElementById('hunt-btn').addEventListener('click', hunt);
+    document.getElementById('rest-btn').addEventListener('click', rest);
 
-                // Re-aplica o highlight com o termo atual
-                renderPreview(newText, currentSearchTerm);
-
-                const msg = replaceTerm ?
-                    `Trocou ${count} ocorrência${count > 1 ? 's' : ''} de "${searchTerm}" por "${replaceTerm}".` :
-                    `Removeu ${count} ocorrência${count > 1 ? 's' : ''} de "${searchTerm}".`;
-                showToast(msg, 2200);
-            }
-
-            // ── Limpar tudo ──
-            function clearAll() {
-                editor.value = '';
-                searchInput.value = '';
-                replaceInput.value = '';
-                currentSearchTerm = '';
-                refreshAll();
-                badgeCount.classList.remove('active');
-                showToast('Texto limpo.', 1000);
-            }
-
-            // ── Limpar destaques (volta ao texto puro no preview) ──
-            function clearHighlights() {
-                const text = getPlainText();
-                currentSearchTerm = '';
-                searchInput.value = '';
-                renderPreview(text, '');
-                badgeCount.classList.remove('active');
-                showToast('Destaques removidos.', 1000);
-            }
-
-            // ── Eventos ──
-            editor.addEventListener('input', refreshAll);
-
-            btnSearch.addEventListener('click', performSearch);
-
-            btnReplace.addEventListener('click', performReplace);
-
-            btnClear.addEventListener('click', clearAll);
-
-            btnClearHighlights.addEventListener('click', clearHighlights);
-
-            // Enter nos campos
-            searchInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    btnSearch.click();
-                }
-            });
-
-            replaceInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    btnReplace.click();
-                }
-            });
-
-            // Ctrl+Shift+F / Ctrl+F no editor (redireciona para busca)
-            editor.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-                    e.preventDefault();
-                    searchInput.focus();
-                    searchInput.select();
-                }
-                if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
-                    e.preventDefault();
-                    replaceInput.focus();
-                    replaceInput.select();
-                }
-            });
-
-            // ── Inicialização ──
-            refreshAll();
-
-            // Exemplo com o texto do usuário (pré-carregado)
-            const exemplo = `Admiração é o prelúdio da frustração
-            Um sonho compartilhado entre eu e meu irmão
-            Ser o melhor atacante, essa era nossa missão
-            Desde que você voltou da Europa, eu não consigo reconhecer essa visão`;
-
-            editor.value = exemplo;
-            refreshAll();
-
-            // Sincroniza o placeholder do preview
-            showToast('📝 Pronto! Cole um texto e use Buscar / Trocar.', 2500);
-
-        })();
-    </script>
-
+    // Iniciar na tela de nome
+    showScreen(startScreen);
+  })();
+</script>
 </body>
 </html>
