@@ -3,265 +3,502 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aristóteles vs Descartes - O Duelo da Filosofia</title>
+    <title> Aristóteles vs Francis Bacon · O Duelo da Ciência </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+
     <style>
-        /* === ESTILO GERAL - SIMPLES E LIMPO === */
+        /* ===== RESET E VARIÁVEIS ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-body: #eef1f5;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --border-glass: rgba(255, 255, 255, 0.4);
+            --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 30px 60px rgba(0, 0, 0, 0.1);
+            
+            --blue-deep: #0a1a2b;
+            --gold-aristotle: #b68b40;
+            --gold-light: #f3e7d3;
+            --bacon-red: #a13d3d;
+            --bacon-light: #f6e8e8;
+            
+            --text-dark: #1a1a2e;
+            --text-soft: #3d3d52;
+            --text-muted: #6b6b82;
+            
+            --radius-xl: 32px;
+            --radius-lg: 20px;
+            --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f4f6f9;
-            color: #1e1e2a;
-            padding: 30px 20px;
-            line-height: 1.7;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: #ffffff;
-            padding: 40px 35px;
-            border-radius: 28px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            background: var(--bg-glass);
+            backdrop-filter: blur(6px);
+            border-radius: var(--radius-xl);
+            padding: 0 30px 40px 30px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
-        /* === CABEÇALHO === */
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 6px;
-            color: #0b0b1a;
-        }
-
-        .subtitulo {
-            font-size: 1.2rem;
-            color: #4a4a5a;
-            border-left: 5px solid #ffb347;
-            padding-left: 18px;
-            margin-bottom: 30px;
-            font-weight: 400;
-        }
-
-        .intro {
-            background: #f0f3fa;
-            padding: 20px 25px;
-            border-radius: 18px;
-            margin-bottom: 40px;
-            font-size: 1.1rem;
-            border: 1px solid #dce1ec;
-        }
-
-        .intro strong {
-            color: #c44536;
-        }
-
-        /* === GRID DE COMPARAÇÃO (LADO A LADO) === */
-        .duelo {
+        /* ===== NAVEGAÇÃO ===== */
+        .nav-sticky {
+            position: sticky;
+            top: 12px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 10px 20px;
+            margin: 0 -10px 30px -10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             display: flex;
             flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 6px 18px;
+        }
+
+        .nav-sticky a {
+            color: var(--text-soft);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 4px 6px;
+            border-radius: 30px;
+            transition: all var(--transition);
+            letter-spacing: 0.2px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-sticky a:hover {
+            color: var(--blue-deep);
+            border-bottom-color: var(--gold-aristotle);
+        }
+
+        /* ===== SEÇÃO 1: CRÉDITOS ===== */
+        .creditos-section {
+            text-align: center;
+            padding: 30px 10px 20px 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            margin-bottom: 30px;
+        }
+
+        .creditos-section .titulo-duelo {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.2rem;
+            font-weight: 700;
+            color: var(--blue-deep);
+            letter-spacing: -0.5px;
+        }
+
+        .creditos-section .titulo-duelo span {
+            background: linear-gradient(135deg, var(--gold-aristotle), #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .creditos-section .sub-duelo {
+            font-size: 1.1rem;
+            color: var(--text-soft);
+            margin: 6px 0 16px 0;
+        }
+
+        .creditos-section .autores-box {
+            display: inline-flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 20px;
+            background: rgba(11, 26, 43, 0.04);
+            padding: 10px 30px;
+            border-radius: 60px;
+            font-weight: 500;
+            color: var(--text-soft);
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .creditos-section .autores-box strong {
+            color: var(--blue-deep);
+        }
+
+        .creditos-section .trabalho-tag {
+            display: inline-block;
+            margin-top: 14px;
+            background: var(--blue-deep);
+            color: #f0e9d8;
+            padding: 6px 28px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 6px 20px rgba(10, 26, 43, 0.15);
+        }
+
+        /* ===== SEÇÕES GERAIS ===== */
+        section {
+            padding: 30px 0 20px 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        .section-label {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            background: rgba(0,0,0,0.03);
+            padding: 2px 18px;
+            border-radius: 60px;
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: var(--blue-deep);
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        h2 .emoji-titulo {
+            margin-right: 12px;
+        }
+
+        .conteudo-texto {
+            font-size: 1.08rem;
+            color: var(--text-soft);
+            max-width: 900px;
+        }
+
+        .conteudo-texto p {
+            margin-bottom: 16px;
+        }
+
+        .conteudo-texto strong {
+            color: var(--blue-deep);
+        }
+
+        .destaque-frase {
+            background: rgba(182, 139, 64, 0.06);
+            border-left: 5px solid var(--gold-aristotle);
+            padding: 18px 24px;
+            border-radius: 0 12px 12px 0;
+            margin: 20px 0;
+            font-style: italic;
+            font-size: 1.15rem;
+            color: var(--blue-deep);
+        }
+
+        /* ===== CARDS FILÓSOFOS ===== */
+        .dupla-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 30px;
-            margin: 35px 0 40px 0;
+            margin: 20px 0 10px 0;
         }
 
-        .card {
-            flex: 1 1 280px;
-            padding: 28px 25px;
-            border-radius: 24px;
-            background: #fafcff;
-            border: 1px solid #e9ecf2;
-            transition: transform 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        .card-filo {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: var(--radius-xl);
+            padding: 28px 26px;
+            box-shadow: var(--shadow-soft);
+            transition: all var(--transition);
         }
 
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+        .card-filo:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
         }
 
-        .card-aristoteles {
-            border-top: 8px solid #b88a5e;
-        }
-
-        .card-descartes {
-            border-top: 8px solid #3a7ca5;
-        }
-
-        .card h2 {
-            font-size: 1.9rem;
-            margin-bottom: 4px;
+        .card-filo .header-filo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
+            margin-bottom: 4px;
         }
 
-        .card h2 span {
-            font-size: 2rem;
+        .card-filo .header-filo .icone-grande {
+            font-size: 2.8rem;
         }
 
-        .card .periodo {
-            font-size: 0.9rem;
-            color: #6b6b7b;
-            margin-bottom: 18px;
+        .card-filo .header-filo h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .card-filo .periodo {
             display: block;
             font-weight: 500;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            padding-left: 4px;
         }
 
-        .card ul {
+        .card-filo ul {
             list-style: none;
             padding: 0;
         }
 
-        .card ul li {
-            padding: 10px 0 10px 32px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%23b88a5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>') left center no-repeat;
-            background-size: 18px;
-            border-bottom: 1px dashed #eef2f7;
+        .card-filo ul li {
+            padding: 10px 0 10px 38px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            background-position: left center;
+            background-repeat: no-repeat;
+            background-size: 24px;
         }
 
-        .card-descartes ul li {
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%233a7ca5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>') left center no-repeat;
-            background-size: 18px;
-        }
-
-        .card ul li:last-child {
+        .card-filo ul li:last-child {
             border-bottom: none;
         }
 
-        .card .destaque {
-            font-weight: 600;
-            color: #1e1e2a;
+        .card-aristoteles .header-filo h3 { color: #7a5d2e; }
+        .card-aristoteles ul li { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23b68b40" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>'); }
+
+        .card-bacon .header-filo h3 { color: #8b2e2e; }
+        .card-bacon ul li { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23a13d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>'); }
+
+        .card-filo ul li .destaque {
+            font-weight: 700;
+            color: var(--blue-deep);
         }
 
-        /* === TABELA DE COMPARAÇÃO RÁPIDA === */
-        .tabela-treta {
-            background: #f8faff;
-            border-radius: 20px;
-            padding: 25px 20px;
-            border: 1px solid #e2e8f0;
-            margin: 30px 0 35px 0;
+        /* ===== COMPARAÇÃO (TABELA) ===== */
+        .comp-table {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(4px);
+            border-radius: var(--radius-xl);
+            padding: 24px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: var(--shadow-soft);
+            margin: 10px 0;
         }
 
-        .tabela-treta h3 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .linha {
+        .comp-row {
             display: flex;
             flex-wrap: wrap;
-            padding: 14px 10px;
-            border-bottom: 1px solid #eef2f7;
             align-items: center;
+            padding: 14px 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
         }
+        .comp-row:last-child { border-bottom: none; }
 
-        .linha:last-child {
-            border-bottom: none;
-        }
-
-        .tema {
-            flex: 1 1 120px;
+        .comp-tema {
+            flex: 1 1 110px;
             font-weight: 700;
-            color: #2d2d3f;
-            font-size: 1.05rem;
+            color: var(--blue-deep);
+            font-size: 1rem;
         }
 
-        .col-aristoteles {
+        .comp-a {
             flex: 2 1 200px;
-            background: #f5efe8;
-            padding: 8px 18px;
-            border-radius: 40px;
-            color: #5d3f23;
-            margin: 4px 0;
+            background: rgba(182, 139, 64, 0.08);
+            padding: 6px 20px;
+            border-radius: 60px;
+            color: #5d3f1a;
+            font-weight: 500;
+            border-left: 4px solid var(--gold-aristotle);
+            margin: 3px 0;
         }
 
-        .col-descartes {
-            flex: 2 1 200px;
-            background: #e5eff7;
-            padding: 8px 18px;
-            border-radius: 40px;
-            color: #1b4b6c;
-            margin: 4px 0;
-        }
-
-        .vs {
-            flex: 0 0 40px;
+        .comp-vs {
+            flex: 0 0 45px;
             text-align: center;
             font-weight: 800;
             color: #b0b8c5;
             font-size: 1.2rem;
         }
 
-        /* === CONCLUSÃO === */
-        .conclusao {
-            background: #eaf3e8;
-            padding: 25px 30px;
-            border-radius: 20px;
-            border-left: 8px solid #3a9b5e;
-            margin-top: 30px;
+        .comp-b {
+            flex: 2 1 200px;
+            background: rgba(161, 61, 61, 0.07);
+            padding: 6px 20px;
+            border-radius: 60px;
+            color: #6e2a2a;
+            font-weight: 500;
+            border-left: 4px solid var(--bacon-red);
+            margin: 3px 0;
         }
 
-        .conclusao h3 {
-            font-size: 1.6rem;
-            margin-bottom: 10px;
-        }
-
-        .conclusao p {
-            font-size: 1.1rem;
-        }
-
-        .conclusao strong {
-            color: #1b6b38;
-        }
-
-        /* === QUIZ === */
-        .quiz-container {
+        /* ===== TRETA ===== */
+        .treta-box {
             background: #fcf9f3;
-            border-radius: 24px;
-            padding: 30px 28px;
-            margin: 40px 0 25px 0;
-            border: 2px solid #e6dccb;
+            border-radius: var(--radius-lg);
+            padding: 28px 32px;
+            border: 1px solid #e8e0d3;
+            box-shadow: var(--shadow-soft);
+            margin: 10px 0;
         }
 
-        .quiz-container h3 {
-            font-size: 1.9rem;
+        .treta-box p {
+            font-size: 1.08rem;
+            color: var(--text-soft);
+            margin-bottom: 14px;
+        }
+
+        .citacao-bacon {
+            background: rgba(161, 61, 61, 0.04);
+            border-left: 6px solid var(--bacon-red);
+            padding: 16px 24px;
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+            margin: 20px 0;
+            font-size: 1.1rem;
+            color: #2d1a1a;
+        }
+
+        /* ===== CONCLUSÃO ===== */
+        .conclusao-box {
+            background: linear-gradient(135deg, #f4f0ea, #e7ecf3);
+            border-radius: var(--radius-xl);
+            padding: 32px 36px;
+            border-left: 10px solid var(--gold-aristotle);
+            box-shadow: var(--shadow-soft);
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .conclusao-box p {
+            font-size: 1.1rem;
+            color: var(--text-soft);
+            max-width: 90%;
+        }
+
+        .conclusao-box strong {
+            color: #1b5e3a;
+        }
+
+        /* ===== QUIZ ===== */
+        .quiz-wrapper {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(6px);
+            border-radius: var(--radius-xl);
+            padding: 30px 28px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: var(--shadow-soft);
+            margin: 10px 0;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        .quiz-header h3 {
+            font-size: 2rem;
             font-weight: 700;
+            color: var(--blue-deep);
+        }
+
+        .quiz-badge {
+            background: var(--blue-deep);
+            color: white;
+            font-weight: 600;
+            padding: 4px 20px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+        }
+
+        .quiz-legenda {
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            padding-bottom: 14px;
+        }
+
+        .pergunta-item {
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            padding: 20px 24px;
+            margin-bottom: 18px;
+            border: 1px solid #eef0f3;
+            transition: all var(--transition);
+        }
+
+        .pergunta-item:hover { border-color: #cdd4df; }
+
+        .p-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
+            gap: 14px;
+            margin-bottom: 12px;
         }
 
-        .quiz-container .legenda {
-            font-size: 0.95rem;
-            color: #5f5f72;
-            margin-bottom: 25px;
+        .p-num {
+            background: var(--blue-deep);
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.85rem;
         }
 
-        .pergunta {
-            background: #ffffff;
-            padding: 18px 22px 22px 22px;
-            border-radius: 18px;
-            margin-bottom: 18px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-            border: 1px solid #ede7db;
+        .p-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 2px 16px;
+            border-radius: 60px;
+            background: #eef2f6;
+            color: var(--text-muted);
         }
 
-        .pergunta p {
+        .p-tag.tag-aristoteles { background: rgba(182, 139, 64, 0.15); color: #7a5d2e; }
+        .p-tag.tag-bacon { background: rgba(161, 61, 61, 0.12); color: #8b2e2e; }
+        .p-tag.tag-comparativa { background: rgba(0, 0, 0, 0.04); color: #4a4a5a; }
+
+        .pergunta-item p {
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             margin-bottom: 10px;
+            color: var(--blue-deep);
         }
 
-        .pergunta label {
+        .pergunta-item label {
             display: block;
-            padding: 6px 0 6px 28px;
+            padding: 6px 0 6px 34px;
             margin: 2px 0;
             border-radius: 10px;
             cursor: pointer;
@@ -269,120 +506,100 @@
             position: relative;
         }
 
-        .pergunta label:hover {
-            background: #f4f0e9;
+        .pergunta-item label:hover { background: #f5f7fc; }
+
+        .pergunta-item input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.1);
+            accent-color: var(--gold-aristotle);
         }
 
-        .pergunta input[type="radio"] {
-            margin-right: 10px;
-            transform: scale(1.1);
-            accent-color: #b88a5e;
+        .pergunta-item.correta { border-left: 8px solid #2b8c4a; background: #f3faf5; }
+        .pergunta-item.errada { border-left: 8px solid #c0392b; background: #fdf3f2; }
+
+        .feedback-detalhe {
+            margin-top: 12px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 500;
+            display: none;
+            font-size: 0.95rem;
         }
+
+        .pergunta-item.correta .feedback-detalhe { display: block; background: rgba(43, 140, 74, 0.06); color: #1b5e33; border: 1px solid rgba(43, 140, 74, 0.12); }
+        .pergunta-item.errada .feedback-detalhe { display: block; background: rgba(192, 57, 43, 0.05); color: #91261b; border: 1px solid rgba(192, 57, 43, 0.12); }
 
         .btn-verificar {
-            background: #2d3e4f;
+            background: var(--blue-deep);
             color: white;
             font-size: 1.2rem;
             font-weight: 600;
-            padding: 14px 40px;
+            padding: 14px 48px;
             border: none;
             border-radius: 60px;
             cursor: pointer;
-            transition: 0.2s;
-            margin-top: 12px;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: all var(--transition);
+            margin-top: 16px;
+            box-shadow: 0 8px 24px rgba(10, 26, 43, 0.2);
         }
 
         .btn-verificar:hover {
-            background: #1b2a38;
-            transform: scale(1.02);
+            background: #142d47;
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 12px 32px rgba(10, 26, 43, 0.3);
         }
 
-        .resultado {
-            margin-top: 25px;
-            padding: 20px 25px;
-            border-radius: 18px;
-            font-size: 1.3rem;
-            font-weight: 600;
-            background: #eef3f0;
-            display: none;
-            border: 2px solid #bacec2;
-        }
-
-        .resultado.mostrar {
-            display: block;
-        }
-
-        .resposta-correta {
-            background: #dff0d8 !important;
-            border-left: 6px solid #3a9b5e;
-            padding-left: 22px !important;
-        }
-
-        .resposta-errada {
-            background: #f8dddd !important;
-            border-left: 6px solid #c0392b;
-            padding-left: 22px !important;
-        }
-
-        .resposta-marcada-errada {
-            background: #f8dddd !important;
-            border-left: 6px solid #c0392b;
-            padding-left: 22px !important;
-        }
-
-        .pergunta .feedback-texto {
-            font-size: 0.9rem;
-            font-weight: 400;
-            margin-top: 6px;
-            padding: 4px 0 0 28px;
-            color: #2d4b3a;
-        }
-
-        .footer {
-            margin-top: 20px;
+        .resultado-final {
+            margin-top: 28px;
+            padding: 22px 30px;
+            border-radius: var(--radius-lg);
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
             text-align: center;
-            color: #7a7a8a;
-            font-size: 0.95rem;
-            border-top: 1px solid #e0e5ed;
-            padding-top: 25px;
+            display: none;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--blue-deep);
+            box-shadow: var(--shadow-soft);
+            animation: fadeSlideUp 0.5s ease;
         }
 
-        /* === RESPONSIVO === */
-        @media (max-width: 700px) {
-            .container {
-                padding: 20px 15px;
-            }
-            h1 {
-                font-size: 2rem;
-            }
-            .card h2 {
-                font-size: 1.6rem;
-            }
-            .linha {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 6px;
-                padding: 18px 0;
-            }
-            .vs {
-                align-self: center;
-                padding: 4px 0;
-            }
-            .col-aristoteles, .col-descartes {
-                width: 100%;
-            }
-            .quiz-container {
-                padding: 18px 14px;
-            }
-            .pergunta {
-                padding: 14px 12px;
-            }
-            .btn-verificar {
-                width: 100%;
-                text-align: center;
-            }
+        .resultado-final.mostrar { display: block; }
+        .resultado-final .nota { font-size: 2.6rem; display: inline-block; margin-right: 12px; }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-site {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(0, 0, 0, 0.04);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ===== RESPONSIVO ===== */
+        @media (max-width: 850px) {
+            .dupla-grid { grid-template-columns: 1fr; gap: 20px; }
+            .container { padding: 0 16px 30px 16px; }
+            .creditos-section .titulo-duelo { font-size: 2.4rem; }
+            h2 { font-size: 2rem; }
+            .nav-sticky { gap: 4px 12px; padding: 8px 12px; }
+            .nav-sticky a { font-size: 0.75rem; }
+            .comp-row { flex-direction: column; align-items: stretch; gap: 4px; padding: 14px 0; }
+            .comp-vs { align-self: center; padding: 2px 0; }
+            .comp-a, .comp-b { width: 100%; }
+            .conclusao-box p { max-width: 100%; }
+            .quiz-header { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .btn-verificar { width: 100%; text-align: center; justify-content: center; }
+        }
+        @media (max-width: 480px) {
+            .creditos-section .titulo-duelo { font-size: 1.8rem; }
+            .pergunta-item { padding: 14px 12px; }
         }
     </style>
 </head>
@@ -390,237 +607,347 @@
 
 <div class="container">
 
-    <!-- CABEÇALHO -->
-    <h1>⚔️ Aristóteles vs. Descartes</h1>
-    <div class="subtitulo">O duelo de ideias que mudou a ciência e a filosofia para sempre</div>
+    <!-- ===== NAVEGAÇÃO STICKY ===== -->
+    <nav class="nav-sticky">
+        <a href="#creditos">Créditos</a>
+        <a href="#aristoteles">Aristóteles</a>
+        <a href="#bacon">Bacon</a>
+        <a href="#comparacao">Comparação</a>
+        <a href="#treta">A "Treta"</a>
+        <a href="#conclusao">Conclusão</a>
+        <a href="#quiz">Quiz</a>
+    </nav>
 
-    <div class="intro">
-        <strong>📖 Leia em 3 minutos:</strong> Aristóteles (384–322 a.C.) e Descartes (1596–1650) nunca se conheceram, 
-        mas suas ideias bateram de frente. Um confiava nos olhos e na natureza; o outro, na razão e na matemática. 
-        Entenda de vez essa "treta" filosófica de forma simples e direta.
-    </div>
-
-    <!-- CARDS LADO A LADO -->
-    <div class="duelo">
-
-        <div class="card card-aristoteles">
-            <h2><span>🏛️</span> Aristóteles</h2>
-            <span class="periodo">Grécia Antiga • 384–322 a.C.</span>
-            <ul>
-                <li><span class="destaque">👀 Observação da realidade</span> — O conhecimento vem da experiência e dos sentidos.</li>
-                <li><span class="destaque">🌿 Tudo tem um propósito</span> — A natureza age com uma finalidade (causa final).</li>
-                <li><span class="destaque">🧬 Alma e corpo são unidos</span> — A alma é a "forma" do corpo; não existem separados.</li>
-                <li><span class="destaque">🔬 Método indutivo</span> — Parte da observação de casos particulares para chegar a leis gerais.</li>
-            </ul>
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 1: CRÉDITOS -->
+    <!-- ============================================================ -->
+    <section id="creditos" class="creditos-section">
+        <div class="titulo-duelo">Aristóteles <span>vs.</span> Francis Bacon</div>
+        <div class="sub-duelo">O embate dos métodos que forjou a ciência moderna</div>
+        
+        <div class="autores-box">
+            ✦ Feito por: <strong>Manoel</strong>, <strong>Yohan</strong>, <strong>Adrian</strong>, <strong>João Gabriel</strong>
         </div>
+        <div class="trabalho-tag">📚 Trabalho de filosofia 2026!</div>
+    </section>
 
-        <div class="card card-descartes">
-            <h2><span>🧠</span> Descartes</h2>
-            <span class="periodo">França • 1596–1650</span>
-            <ul>
-                <li><span class="destaque">🤔 Dúvida e razão pura</span> — Os sentidos enganam; só a razão garante a verdade.</li>
-                <li><span class="destaque">⚙️ Universo é uma máquina</span> — Tudo se explica por matéria e movimento, sem "finalidades".</li>
-                <li><span class="destaque">💡 Alma separada do corpo</span> — O corpo é uma máquina; a alma (mente) é uma substância à parte.</li>
-                <li><span class="destaque">📐 Método dedutivo</span> — Parte de verdades claras (como "Penso, logo existo") para deduzir o resto.</li>
-            </ul>
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 2: ARISTÓTELES -->
+    <!-- ============================================================ -->
+    <section id="aristoteles">
+        <span class="section-label">Filósofo 1</span>
+        <h2><span class="emoji-titulo">🏛️</span> Aristóteles</h2>
+        <div class="dupla-grid">
+            <div class="card-filo card-aristoteles">
+                <div class="header-filo">
+                    <span class="icone-grande">📜</span>
+                    <h3>O Estagirita</h3>
+                </div>
+                <span class="periodo">Grécia Antiga · 384 – 322 a.C.</span>
+                <ul>
+                    <li><span class="destaque">👀 Observação da realidade</span> — O saber nasce da experiência e dos sentidos.</li>
+                    <li><span class="destaque">🌿 Teleologia (Causa Final)</span> — A natureza age com um propósito intrínseco.</li>
+                    <li><span class="destaque">🧬 Alma e corpo unidos</span> — A alma é a "forma" do corpo (Hilemorfismo).</li>
+                    <li><span class="destaque">🔬 Indução intuitiva</span> — A mente capta essências após poucas observações.</li>
+                </ul>
+            </div>
+            <div class="conteudo-texto">
+                <p><strong>O primeiro biólogo do Ocidente.</strong> Aristóteles passava horas dissecando animais e observando o comportamento de polvos e abelhas. Para ele, a natureza era um grande organismo vivo, onde tudo se movia em direção a um fim.</p>
+                <p>Sua frase "Não há nada no intelecto que não tenha passado antes pelos sentidos" resume sua crença no mundo concreto. No entanto, ele acreditava que a mente humana poderia <strong>intuir</strong> a essência das coisas após poucos exemplos, o que, segundo seus críticos, o levava a generalizações apressadas.</p>
+                <div class="destaque-frase">
+                    “O homem é um animal político” — Aristóteles
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <!-- TABELA DE COMPARAÇÃO RÁPIDA -->
-    <div class="tabela-treta">
-        <h3>📊 Comparação lado a lado</h3>
-
-        <div class="linha">
-            <div class="tema">Base do saber</div>
-            <div class="col-aristoteles">✅ Experiência e sentidos</div>
-            <div class="vs">⚡</div>
-            <div class="col-descartes">✅ Razão e intuição matemática</div>
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 3: BACON -->
+    <!-- ============================================================ -->
+    <section id="bacon">
+        <span class="section-label">Filósofo 2</span>
+        <h2><span class="emoji-titulo">⚗️</span> Francis Bacon</h2>
+        <div class="dupla-grid">
+            <div class="card-filo card-bacon">
+                <div class="header-filo">
+                    <span class="icone-grande">🧪</span>
+                    <h3>O Profeta do Experimental</h3>
+                </div>
+                <span class="periodo">Inglaterra · 1561 – 1626</span>
+                <ul>
+                    <li><span class="destaque">🔎 Empirismo radical</span> — A ciência exige coleta exaustiva de dados.</li>
+                    <li><span class="destaque">⚙️ Mecanicismo</span> — A natureza é matéria em movimento; não há "finalidades".</li>
+                    <li><span class="destaque">🧠 Teoria dos Ídolos</span> — A mente humana é cheia de vícios que distorcem a realidade.</li>
+                    <li><span class="destaque">📊 Método indutivo rigoroso</span> — Generalização só após repetidos testes (tabelas de presença, ausência e graus).</li>
+                </ul>
+            </div>
+            <div class="conteudo-texto">
+                <p><strong>O algoz de Aristóteles.</strong> Bacon leu os gregos, mas sentiu nojo da complacência intelectual. Em sua obra <em>Novum Organum</em> (1620), ele acusou Aristóteles de construir um belo "teatro" de conceitos que não correspondiam à realidade bruta.</p>
+                <p>Bacon defendia que a ciência deveria "torturar a natureza" para extrair seus segredos (uma metáfora para a experimentação ativa). Ele odiava a Causa Final aristotélica: para ele, saber para que serve uma folha é uma pergunta infantil; o que importa é como ela funciona e o que podemos fazer com ela.</p>
+                <div class="destaque-frase" style="border-left-color: var(--bacon-red);">
+                    “Saber é poder” — Francis Bacon
+                </div>
+            </div>
         </div>
+    </section>
 
-        <div class="linha">
-            <div class="tema">Natureza</div>
-            <div class="col-aristoteles">🌳 Tem finalidade (teleologia)</div>
-            <div class="vs">⚡</div>
-            <div class="col-descartes">🕹️ É puro mecanismo (relógio)</div>
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 4: COMPARAÇÃO -->
+    <!-- ============================================================ -->
+    <section id="comparacao">
+        <span class="section-label">Lado a Lado</span>
+        <h2><span class="emoji-titulo">📊</span> Comparação Direta</h2>
+        <div class="comp-table">
+            <div class="comp-row">
+                <div class="comp-tema">Base do saber</div>
+                <div class="comp-a">✅ Experiência e sentidos</div>
+                <div class="comp-vs">⚡</div>
+                <div class="comp-b">✅ Experiência + Experimentação</div>
+            </div>
+            <div class="comp-row">
+                <div class="comp-tema">Visão da natureza</div>
+                <div class="comp-a">🌳 Orgânica (com finalidade)</div>
+                <div class="comp-vs">⚡</div>
+                <div class="comp-b">🕹️ Mecânica (sem propósito)</div>
+            </div>
+            <div class="comp-row">
+                <div class="comp-tema">Método</div>
+                <div class="comp-a">🔎 Indução intuitiva (generalização rápida)</div>
+                <div class="comp-vs">⚡</div>
+                <div class="comp-b">📊 Indução rigorosa (tabelas e repetição)</div>
+            </div>
+            <div class="comp-row">
+                <div class="comp-tema">Papel da ciência</div>
+                <div class="comp-a">🤔 Contemplar a verdade eterna</div>
+                <div class="comp-vs">⚡</div>
+                <div class="comp-b">🛠️ Dominar a natureza para aliviar a dor humana</div>
+            </div>
+            <div class="comp-row">
+                <div class="comp-tema">Frase célebre</div>
+                <div class="comp-a">"O homem é um animal político"</div>
+                <div class="comp-vs">⚡</div>
+                <div class="comp-b">"Saber é poder"</div>
+            </div>
         </div>
+    </section>
 
-        <div class="linha">
-            <div class="tema">A alma</div>
-            <div class="col-aristoteles">🔗 Ligada ao corpo (hilemorfismo)</div>
-            <div class="vs">⚡</div>
-            <div class="col-descartes">💨 Separada do corpo (dualismo)</div>
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 5: A "TRETA" -->
+    <!-- ============================================================ -->
+    <section id="treta">
+        <span class="section-label">O Conflito</span>
+        <h2><span class="emoji-titulo">⚔️</span> A "Treta" Filosófica</h2>
+        <div class="treta-box">
+            <p><strong>O grande erro de Aristóteles, segundo Bacon, foi antecipar a natureza em vez de interpretá-la.</strong> O grego partia de observações soltas e, com um salto lógico, já definia leis universais. Para Bacon, isso era construir castelos no ar.</p>
+            
+            <div class="citacao-bacon">
+                “O silogismo não serve para descobrir princípios, apenas para organizar o que já sabemos. A ciência não pode ser feita em poltronas.”
+            </div>
+
+            <p><strong>Bacon atacou a "Causa Final"</strong> de Aristóteles com fúria. Dizer que "as folhas existem para proteger os frutos" é uma explicação vazia para a física. A natureza não tem planos; ela é um mecanismo bruto. O verdadeiro cientista não pergunta "O que isso significa?", mas sim "Como isso se comporta sob pressão, calor ou movimento?"</p>
+            
+            <p>Além disso, Bacon identificou os <strong>"Ídolos"</strong> (da Tribo, da Caverna, do Foro e do Teatro) — vícios inerentes à mente humana. E o maior desses ídolos era o próprio Aristóteles, cujo sistema filosófico (o Teatro) cegava as pessoas para a realidade concreta. Enquanto Aristóteles confiava na intuição da mente, Bacon confiava na dor da experiência controlada.</p>
+            
+            <p><strong>O resultado?</strong> Bacon não apenas criticou; ele deu ao mundo um novo instrumento (o <em>Novum Organum</em>) para substituir o velho <em>Organon</em> aristotélico. A ciência deixou de ser uma busca pela essência eterna e passou a ser uma <strong>caça aos mecanismos da natureza</strong>.</p>
         </div>
+    </section>
 
-        <div class="linha">
-            <div class="tema">Método científico</div>
-            <div class="col-aristoteles">🔎 Observação + Indução</div>
-            <div class="vs">⚡</div>
-            <div class="col-descartes">📏 Dúvida + Dedução</div>
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 6: CONCLUSÃO -->
+    <!-- ============================================================ -->
+    <section id="conclusao">
+        <span class="section-label">Síntese</span>
+        <h2><span class="emoji-titulo">🌟</span> Conclusão</h2>
+        <div class="conclusao-box">
+            <p><strong>Nenhum dos dois venceu — e os dois venceram.</strong> Francis Bacon deu à humanidade o <strong>método experimental</strong> e a justificativa para o progresso técnico. Sem ele, não teríamos laboratórios modernos, nem a ciência como força motriz da sociedade.</p>
+            <p>Porém, Aristóteles ainda respira dentro de nós. Ele nos ensinou a <strong>amar a observação</strong>, a classificar os seres vivos com cuidado e a fazer as perguntas certas sobre a finalidade e a essência. A biologia moderna ainda segue sua estrutura de classificação, enquanto aplica o rigor experimental de Bacon.</p>
+            <p style="margin-top: 12px;"><strong>A grande lição:</strong> Aristóteles nos deu a <em>pergunta</em>; Bacon nos deu o <em>método</em>. A ciência não precisou escolher; ela precisou dos dois. O duelo mais intenso da história não destruiu nenhum lutador — apenas os imortalizou, lado a lado, nos pilares do conhecimento humano.</p>
         </div>
+    </section>
 
-        <div class="linha">
-            <div class="tema">Frase famosa</div>
-            <div class="col-aristoteles">"O homem é um animal político"</div>
-            <div class="vs">⚡</div>
-            <div class="col-descartes">"Penso, logo existo"</div>
+    <!-- ============================================================ -->
+    <!-- SEÇÃO 7: QUIZ -->
+    <!-- ============================================================ -->
+    <section id="quiz">
+        <span class="section-label">Teste seu conhecimento</span>
+        <div class="quiz-wrapper">
+            <div class="quiz-header">
+                <h3>🧠 Quiz Filosófico</h3>
+                <span class="quiz-badge">6 perguntas</span>
+            </div>
+            <div class="quiz-legenda">
+                2 sobre Aristóteles · 2 sobre Bacon · 2 comparativas. Marque as respostas e clique em "Verificar".
+            </div>
+
+            <!-- Pergunta 1 (Aristóteles) -->
+            <div class="pergunta-item" id="q1">
+                <div class="p-header">
+                    <span class="p-num">1</span>
+                    <span class="p-tag tag-aristoteles">Aristóteles</span>
+                </div>
+                <p>Como Aristóteles acreditava que o conhecimento era obtido principalmente?</p>
+                <label><input type="radio" name="q1" value="0"> Pela razão pura e matemática</label>
+                <label><input type="radio" name="q1" value="1"> Pela observação da realidade e experiência</label>
+                <label><input type="radio" name="q1" value="2"> Pela experimentação ativa e tortura da natureza</label>
+                <label><input type="radio" name="q1" value="3"> Pela dúvida metódica radical</label>
+                <div class="feedback-detalhe">✅ Correto! Aristóteles partia dos sentidos e da experiência para chegar ao conhecimento.</div>
+            </div>
+
+            <!-- Pergunta 2 (Aristóteles) -->
+            <div class="pergunta-item" id="q2">
+                <div class="p-header">
+                    <span class="p-num">2</span>
+                    <span class="p-tag tag-aristoteles">Aristóteles</span>
+                </div>
+                <p>O que Aristóteles entendia por "Causa Final" na natureza?</p>
+                <label><input type="radio" name="q2" value="0"> Que tudo na natureza tem um propósito intrínseco a ser cumprido</label>
+                <label><input type="radio" name="q2" value="1"> Que a natureza é um mecanismo cego sem direção</label>
+                <label><input type="radio" name="q2" value="2"> Que os fenômenos naturais são determinados apenas por contato físico</label>
+                <label><input type="radio" name="q2" value="3"> Que a ciência deve ignorar os fins para focar nos meios</label>
+                <div class="feedback-detalhe">✅ Correto! A teleologia aristotélica afirma que tudo busca sua finalidade natural.</div>
+            </div>
+
+            <!-- Pergunta 3 (Bacon) -->
+            <div class="pergunta-item" id="q3">
+                <div class="p-header">
+                    <span class="p-num">3</span>
+                    <span class="p-tag tag-bacon">Bacon</span>
+                </div>
+                <p>Qual era a principal ferramenta metodológica proposta por Francis Bacon?</p>
+                <label><input type="radio" name="q3" value="0"> A dedução silogística a partir de verdades eternas</label>
+                <label><input type="radio" name="q3" value="1"> A intuição matemática para captar essências</label>
+                <label><input type="radio" name="q3" value="2"> A indução rigorosa baseada em tabelas de coleta de dados</label>
+                <label><input type="radio" name="q3" value="3"> A dúvida hiperbólica para encontrar certezas</label>
+                <div class="feedback-detalhe">✅ Correto! Bacon criou um método indutivo exaustivo (Tabelas de Presença, Ausência e Graus).</div>
+            </div>
+
+            <!-- Pergunta 4 (Bacon) -->
+            <div class="pergunta-item" id="q4">
+                <div class="p-header">
+                    <span class="p-num">4</span>
+                    <span class="p-tag tag-bacon">Bacon</span>
+                </div>
+                <p>O que Bacon chamava de "Ídolos" que atrapalham a ciência?</p>
+                <label><input type="radio" name="q4" value="0"> As estátuas gregas que representavam a perfeição</label>
+                <label><input type="radio" name="q4" value="1"> As crenças religiosas que impedem a observação</label>
+                <label><input type="radio" name="q4" value="2"> Os vícios e ilusões da mente humana que distorcem a realidade</label>
+                <label><input type="radio" name="q4" value="3"> Os experimentos que falham por falta de equipamento</label>
+                <div class="feedback-detalhe">✅ Correto! Os Ídolos (Tribo, Caverna, Foro, Teatro) são os erros inatos da cognição.</div>
+            </div>
+
+            <!-- Pergunta 5 (Comparativa) -->
+            <div class="pergunta-item" id="q5">
+                <div class="p-header">
+                    <span class="p-num">5</span>
+                    <span class="p-tag tag-comparativa">Comparativa</span>
+                </div>
+                <p>Qual dos dois filósofos defendia que a ciência deveria ter um propósito prático de dominar a natureza?</p>
+                <label><input type="radio" name="q5" value="0"> Aristóteles</label>
+                <label><input type="radio" name="q5" value="1"> Francis Bacon</label>
+                <div class="feedback-detalhe">✅ Correto! Bacon via o conhecimento como poder para aliviar a condição humana.</div>
+            </div>
+
+            <!-- Pergunta 6 (Comparativa) -->
+            <div class="pergunta-item" id="q6">
+                <div class="p-header">
+                    <span class="p-num">6</span>
+                    <span class="p-tag tag-comparativa">Comparativa</span>
+                </div>
+                <p>Qual dos dois confiava na capacidade da mente humana de intuir a essência das coisas a partir de poucas observações?</p>
+                <label><input type="radio" name="q6" value="0"> Aristóteles</label>
+                <label><input type="radio" name="q6" value="1"> Francis Bacon</label>
+                <div class="feedback-detalhe">✅ Correto! Aristóteles acreditava na indução intuitiva, algo que Bacon criticou duramente.</div>
+            </div>
+
+            <button class="btn-verificar" onclick="verificarQuiz()">✅ Verificar respostas</button>
+
+            <div class="resultado-final" id="resultadoFinal"></div>
         </div>
-    </div>
+    </section>
 
-    <!-- CONCLUSÃO -->
-    <div class="conclusao">
-        <h3>🌟 E no fim, quem ganhou?</h3>
-        <p>
-            <strong>Nenhum dos dois — e os dois ao mesmo tempo!</strong> 
-            Descartes derrubou a física antiga de Aristóteles e abriu caminho para a ciência moderna com sua visão matemática. 
-            Mas a ciência de hoje descobriu que a <strong>observação empírica</strong> (que Aristóteles amava) é essencial 
-            para testar as teorias. Usamos a <strong>razão cartesiana</strong> para criar hipóteses e a 
-            <strong>experiência aristotélica</strong> para validá-las. 
-            No fim, essa "treta" de 2.000 anos foi o melhor presente que a filosofia deu à humanidade!
-        </p>
-    </div>
-
-    <!-- ============ QUIZ ============ -->
-    <div class="quiz-container" id="quiz">
-        <h3>🧠 Teste seu conhecimento</h3>
-        <div class="legenda">6 perguntas: 2 sobre Aristóteles, 2 sobre Descartes e 2 comparativas. Marque as respostas e clique em "Verificar".</div>
-
-        <!-- Pergunta 1 - Aristóteles -->
-        <div class="pergunta" id="p1">
-            <p>1. Como Aristóteles acreditava que o conhecimento era obtido principalmente?</p>
-            <label><input type="radio" name="q1" value="0"> Pela razão pura e matemática</label>
-            <label><input type="radio" name="q1" value="1"> Pela observação da realidade e experiência</label>
-            <label><input type="radio" name="q1" value="2"> Pela dúvida metódica sistemática</label>
-            <label><input type="radio" name="q1" value="3"> Pela intuição divina</label>
-        </div>
-
-        <!-- Pergunta 2 - Aristóteles -->
-        <div class="pergunta" id="p2">
-            <p>2. Para Aristóteles, qual era a relação entre alma e corpo?</p>
-            <label><input type="radio" name="q2" value="0"> São totalmente separados e independentes</label>
-            <label><input type="radio" name="q2" value="1"> A alma é a "forma" do corpo; estão unidos</label>
-            <label><input type="radio" name="q2" value="2"> A alma controla o corpo pela glândula pineal</label>
-            <label><input type="radio" name="q2" value="3"> O corpo é uma ilusão criada pela mente</label>
-        </div>
-
-        <!-- Pergunta 3 - Descartes -->
-        <div class="pergunta" id="p3">
-            <p>3. Qual frase célebre resume o pensamento de Descartes?</p>
-            <label><input type="radio" name="q3" value="0"> "O homem é um animal político"</label>
-            <label><input type="radio" name="q3" value="1"> "Só sei que nada sei"</label>
-            <label><input type="radio" name="q3" value="2"> "Penso, logo existo"</label>
-            <label><input type="radio" name="q3" value="3"> "O fim justifica os meios"</label>
-        </div>
-
-        <!-- Pergunta 4 - Descartes -->
-        <div class="pergunta" id="p4">
-            <p>4. Como Descartes via o funcionamento do universo?</p>
-            <label><input type="radio" name="q4" value="0"> Como um organismo vivo com finalidades próprias</label>
-            <label><input type="radio" name="q4" value="1"> Como um mecanismo (máquina) regido por leis matemáticas</label>
-            <label><input type="radio" name="q4" value="2"> Como um caos imprevisível e sem ordem</label>
-            <label><input type="radio" name="q4" value="3"> Como um ciclo eterno de reencarnações</label>
-        </div>
-
-        <!-- Pergunta 5 - Comparativa -->
-        <div class="pergunta" id="p5">
-            <p>5. Qual dos dois filósofos defendia que os sentidos podem enganar e, por isso, deveríamos duvidar de tudo?</p>
-            <label><input type="radio" name="q5" value="0"> Aristóteles</label>
-            <label><input type="radio" name="q5" value="1"> Descartes</label>
-        </div>
-
-        <!-- Pergunta 6 - Comparativa -->
-        <div class="pergunta" id="p6">
-            <p>6. Qual dos dois filósofos acreditava que a natureza age com um propósito (causa final)?</p>
-            <label><input type="radio" name="q6" value="0"> Aristóteles</label>
-            <label><input type="radio" name="q6" value="1"> Descartes</label>
-        </div>
-
-        <button class="btn-verificar" onclick="verificarQuiz()">✅ Verificar respostas</button>
-
-        <div class="resultado" id="resultado"></div>
-    </div>
-
-    <!-- RODAPÉ -->
-    <div class="footer">
-        ✨ Conteúdo simples e direto para qualquer pessoa entender • Feito com 💙 para amantes do saber
+    <!-- ===== FOOTER ===== -->
+    <div class="footer-site">
+        <span>✦ Conteúdo filosófico produzido com base no confronto histórico entre Aristóteles e Francis Bacon.</span>
     </div>
 
 </div>
 
-<!-- ============ SCRIPT DO QUIZ ============ -->
+<!-- ===== SCRIPT DO QUIZ ===== -->
 <script>
     function verificarQuiz() {
-        // Respostas corretas (índice de cada pergunta)
         const gabarito = {
             q1: 1,
-            q2: 1,
+            q2: 0,
             q3: 2,
-            q4: 1,
+            q4: 2,
             q5: 1,
             q6: 0
         };
 
         let acertos = 0;
         const total = 6;
-        const resultadoDiv = document.getElementById('resultado');
+        const resultadoDiv = document.getElementById('resultadoFinal');
 
         // Limpa estilos anteriores
-        document.querySelectorAll('.pergunta').forEach(p => {
-            p.querySelectorAll('label').forEach(label => {
-                label.classList.remove('resposta-correta', 'resposta-errada', 'resposta-marcada-errada');
-            });
+        document.querySelectorAll('.pergunta-item').forEach(el => {
+            el.classList.remove('correta', 'errada');
         });
 
-        // Percorre cada pergunta
+        // Itera sobre as 6 perguntas
         for (let i = 1; i <= total; i++) {
             const name = 'q' + i;
             const radios = document.querySelectorAll(`input[name="${name}"]`);
-            let selecionado = null;
-            let valorSelecionado = -1;
+            let selecionado = -1;
+            let labelSelecionado = null;
 
-            // Descobre qual foi marcado
-            radios.forEach((radio, index) => {
+            radios.forEach((radio, idx) => {
                 if (radio.checked) {
-                    selecionado = radio.parentElement;
-                    valorSelecionado = index;
+                    selecionado = idx;
+                    labelSelecionado = radio.parentElement;
                 }
             });
 
             const correto = gabarito[name];
-            const labels = document.querySelectorAll(`input[name="${name}"]`);
+            const perguntaDiv = document.getElementById(name);
 
-            // Marca a resposta correta em verde
-            labels.forEach((radio, idx) => {
+            // Marca visual de correto/errado
+            if (selecionado === correto) {
+                acertos++;
+                perguntaDiv.classList.add('correta');
+            } else {
+                perguntaDiv.classList.add('errada');
+            }
+
+            // Marca a opção correta em verde claro (destaque) e a errada em vermelho se o usuário errou
+            radios.forEach((radio, idx) => {
                 const label = radio.parentElement;
                 if (idx === correto) {
-                    label.classList.add('resposta-correta');
+                    label.style.fontWeight = '700';
+                    label.style.color = '#1b5e33';
+                } else if (idx === selecionado && selecionado !== correto) {
+                    label.style.fontWeight = '700';
+                    label.style.color = '#91261b';
+                } else {
+                    label.style.fontWeight = 'normal';
+                    label.style.color = 'inherit';
                 }
             });
-
-            // Verifica se o usuário acertou
-            if (valorSelecionado === correto) {
-                acertos++;
-            } else if (selecionado) {
-                // Se errou, marca a escolhida em vermelho
-                selecionado.classList.add('resposta-errada');
-            }
         }
 
-        // Exibe resultado
+        // Mensagem final
         let mensagem = '';
         if (acertos === total) {
-            mensagem = '🎉 Perfeito! Você gabaritou! É um verdadeiro filósofo ou filósofa!';
+            mensagem = '🎉 Perfeito! Você gabaritou! É um verdadeiro filósofo da ciência!';
         } else if (acertos >= 4) {
-            mensagem = `🧐 Muito bem! Você acertou ${acertos}/${total}. Quase lá! Releia os cards para cravar 100%.`;
+            mensagem = `🧐 Muito bem! Você acertou ${acertos}/${total}. Releia os detalhes da "treta" para fechar com chave de ouro.`;
         } else if (acertos >= 2) {
-            mensagem = `📖 Você acertou ${acertos}/${total}. Vale a pena dar uma revisada nas diferenças entre eles!`;
+            mensagem = `📖 Você acertou ${acertos}/${total}. Vale a pena revisar as diferenças entre a indução aristotélica e a baconiana.`;
         } else {
-            mensagem = `😅 Você acertou ${acertos}/${total}. Que tal reler o conteúdo com calma? Depois tente de novo!`;
+            mensagem = `😅 Você acertou ${acertos}/${total}. Que tal reler o conteúdo com calma? Depois tente novamente!`;
         }
 
-        resultadoDiv.textContent = mensagem;
+        resultadoDiv.innerHTML = `<span class="nota">${acertos}/${total}</span> ${mensagem}`;
         resultadoDiv.classList.add('mostrar');
-
-        // Rola suavemente até o resultado
         resultadoDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 </script>
