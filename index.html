@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Aristóteles vs Francis Bacon · O Duelo da Ciência </title>
+    <title> Aristóteles vs Francis Bacon · Duelo Filosófico </title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
 
     <style>
-        /* ===== RESET E VARIÁVEIS ===== */
+        /* ===== RESET E VARIÁVEIS (DARK THEME) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -18,21 +18,24 @@
         }
 
         :root {
-            --bg-body: #eef1f5;
-            --bg-glass: rgba(255, 255, 255, 0.7);
-            --border-glass: rgba(255, 255, 255, 0.4);
-            --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.05);
-            --shadow-hover: 0 30px 60px rgba(0, 0, 0, 0.1);
+            --bg-body: #0b0f15;
+            --bg-glass: rgba(255, 255, 255, 0.04);
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(255, 255, 255, 0.06);
+            --border-hover: rgba(255, 255, 255, 0.12);
+            --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.7);
+            --shadow-hover: 0 30px 60px rgba(0, 0, 0, 0.9);
+            --shadow-glow: 0 0 40px rgba(212, 163, 115, 0.05);
             
-            --blue-deep: #0a1a2b;
-            --gold-aristotle: #b68b40;
-            --gold-light: #f3e7d3;
-            --bacon-red: #a13d3d;
-            --bacon-light: #f6e8e8;
+            --blue-deep: #e6edf3;
+            --gold-aristotle: #d4a373;
+            --gold-soft: #f0d5b0;
+            --bacon-red: #e05a4a;
+            --bacon-soft: #f2c8c0;
             
-            --text-dark: #1a1a2e;
-            --text-soft: #3d3d52;
-            --text-muted: #6b6b82;
+            --text-dark: #e6edf3;
+            --text-soft: #b0b8c5;
+            --text-muted: #6e7a8a;
             
             --radius-xl: 32px;
             --radius-lg: 20px;
@@ -49,31 +52,34 @@
             color: var(--text-dark);
             line-height: 1.6;
             padding: 20px;
+            min-height: 100vh;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             background: var(--bg-glass);
-            backdrop-filter: blur(6px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: var(--radius-xl);
             padding: 0 30px 40px 30px;
             box-shadow: var(--shadow-soft);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid var(--border-glass);
         }
 
-        /* ===== NAVEGAÇÃO ===== */
+        /* ===== NAVEGAÇÃO STICKY ===== */
         .nav-sticky {
             position: sticky;
             top: 12px;
             z-index: 100;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
+            background: rgba(11, 15, 21, 0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-radius: 60px;
             padding: 10px 20px;
             margin: 0 -10px 30px -10px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -94,7 +100,7 @@
         }
 
         .nav-sticky a:hover {
-            color: var(--blue-deep);
+            color: var(--gold-aristotle);
             border-bottom-color: var(--gold-aristotle);
         }
 
@@ -102,7 +108,7 @@
         .creditos-section {
             text-align: center;
             padding: 30px 10px 20px 10px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             margin-bottom: 30px;
         }
 
@@ -110,12 +116,13 @@
             font-family: 'Playfair Display', serif;
             font-size: 3.2rem;
             font-weight: 700;
-            color: var(--blue-deep);
+            color: var(--text-dark);
             letter-spacing: -0.5px;
+            text-shadow: 0 0 60px rgba(212, 163, 115, 0.08);
         }
 
         .creditos-section .titulo-duelo span {
-            background: linear-gradient(135deg, var(--gold-aristotle), #d4af37);
+            background: linear-gradient(135deg, var(--gold-aristotle), #e8c48a);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -132,37 +139,39 @@
             flex-wrap: wrap;
             justify-content: center;
             gap: 8px 20px;
-            background: rgba(11, 26, 43, 0.04);
+            background: rgba(255, 255, 255, 0.04);
             padding: 10px 30px;
             border-radius: 60px;
             font-weight: 500;
             color: var(--text-soft);
-            border: 1px solid rgba(0,0,0,0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(4px);
         }
 
         .creditos-section .autores-box strong {
-            color: var(--blue-deep);
+            color: var(--gold-aristotle);
         }
 
         .creditos-section .trabalho-tag {
             display: inline-block;
             margin-top: 14px;
-            background: var(--blue-deep);
-            color: #f0e9d8;
+            background: linear-gradient(135deg, #1a1f2b, #0d1117);
+            color: var(--gold-soft);
             padding: 6px 28px;
             border-radius: 60px;
             font-weight: 600;
             font-size: 0.85rem;
             letter-spacing: 1px;
             text-transform: uppercase;
-            box-shadow: 0 6px 20px rgba(10, 26, 43, 0.15);
+            border: 1px solid rgba(212, 163, 115, 0.2);
+            box-shadow: 0 0 30px rgba(212, 163, 115, 0.03);
         }
 
         /* ===== SEÇÕES GERAIS ===== */
         section {
             padding: 30px 0 20px 0;
             margin-bottom: 10px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
         }
 
         section:last-of-type {
@@ -176,17 +185,18 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             color: var(--text-muted);
-            background: rgba(0,0,0,0.03);
+            background: rgba(255, 255, 255, 0.03);
             padding: 2px 18px;
             border-radius: 60px;
             margin-bottom: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
         }
 
         h2 {
             font-family: 'Playfair Display', serif;
             font-size: 2.6rem;
             font-weight: 700;
-            color: var(--blue-deep);
+            color: var(--text-dark);
             margin-bottom: 16px;
             line-height: 1.2;
         }
@@ -206,18 +216,19 @@
         }
 
         .conteudo-texto strong {
-            color: var(--blue-deep);
+            color: var(--text-dark);
         }
 
         .destaque-frase {
-            background: rgba(182, 139, 64, 0.06);
+            background: rgba(212, 163, 115, 0.06);
             border-left: 5px solid var(--gold-aristotle);
             padding: 18px 24px;
             border-radius: 0 12px 12px 0;
             margin: 20px 0;
             font-style: italic;
             font-size: 1.15rem;
-            color: var(--blue-deep);
+            color: var(--gold-soft);
+            backdrop-filter: blur(4px);
         }
 
         /* ===== CARDS FILÓSOFOS ===== */
@@ -229,9 +240,10 @@
         }
 
         .card-filo {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: var(--radius-xl);
             padding: 28px 26px;
             box-shadow: var(--shadow-soft);
@@ -241,6 +253,8 @@
         .card-filo:hover {
             transform: translateY(-6px);
             box-shadow: var(--shadow-hover);
+            border-color: var(--border-hover);
+            background: rgba(255, 255, 255, 0.06);
         }
 
         .card-filo .header-filo {
@@ -275,34 +289,35 @@
 
         .card-filo ul li {
             padding: 10px 0 10px 38px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             background-position: left center;
             background-repeat: no-repeat;
-            background-size: 24px;
+            background-size: 22px;
+            opacity: 0.9;
         }
 
         .card-filo ul li:last-child {
             border-bottom: none;
         }
 
-        .card-aristoteles .header-filo h3 { color: #7a5d2e; }
-        .card-aristoteles ul li { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23b68b40" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>'); }
+        .card-aristoteles .header-filo h3 { color: var(--gold-aristotle); }
+        .card-aristoteles ul li { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23d4a373" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>'); }
 
-        .card-bacon .header-filo h3 { color: #8b2e2e; }
-        .card-bacon ul li { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23a13d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>'); }
+        .card-bacon .header-filo h3 { color: var(--bacon-red); }
+        .card-bacon ul li { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23e05a4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>'); }
 
         .card-filo ul li .destaque {
             font-weight: 700;
-            color: var(--blue-deep);
+            color: var(--text-dark);
         }
 
         /* ===== COMPARAÇÃO (TABELA) ===== */
         .comp-table {
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(4px);
             border-radius: var(--radius-xl);
             padding: 24px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             box-shadow: var(--shadow-soft);
             margin: 10px 0;
         }
@@ -312,23 +327,23 @@
             flex-wrap: wrap;
             align-items: center;
             padding: 14px 10px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
         }
         .comp-row:last-child { border-bottom: none; }
 
         .comp-tema {
             flex: 1 1 110px;
             font-weight: 700;
-            color: var(--blue-deep);
+            color: var(--text-dark);
             font-size: 1rem;
         }
 
         .comp-a {
             flex: 2 1 200px;
-            background: rgba(182, 139, 64, 0.08);
+            background: rgba(212, 163, 115, 0.08);
             padding: 6px 20px;
             border-radius: 60px;
-            color: #5d3f1a;
+            color: var(--gold-soft);
             font-weight: 500;
             border-left: 4px solid var(--gold-aristotle);
             margin: 3px 0;
@@ -338,16 +353,16 @@
             flex: 0 0 45px;
             text-align: center;
             font-weight: 800;
-            color: #b0b8c5;
+            color: var(--text-muted);
             font-size: 1.2rem;
         }
 
         .comp-b {
             flex: 2 1 200px;
-            background: rgba(161, 61, 61, 0.07);
+            background: rgba(224, 90, 74, 0.08);
             padding: 6px 20px;
             border-radius: 60px;
-            color: #6e2a2a;
+            color: var(--bacon-soft);
             font-weight: 500;
             border-left: 4px solid var(--bacon-red);
             margin: 3px 0;
@@ -355,12 +370,13 @@
 
         /* ===== TRETA ===== */
         .treta-box {
-            background: #fcf9f3;
+            background: rgba(255, 255, 255, 0.02);
             border-radius: var(--radius-lg);
             padding: 28px 32px;
-            border: 1px solid #e8e0d3;
+            border: 1px solid rgba(255, 255, 255, 0.04);
             box-shadow: var(--shadow-soft);
             margin: 10px 0;
+            backdrop-filter: blur(4px);
         }
 
         .treta-box p {
@@ -370,25 +386,26 @@
         }
 
         .citacao-bacon {
-            background: rgba(161, 61, 61, 0.04);
+            background: rgba(224, 90, 74, 0.06);
             border-left: 6px solid var(--bacon-red);
             padding: 16px 24px;
             border-radius: 0 12px 12px 0;
             font-style: italic;
             margin: 20px 0;
             font-size: 1.1rem;
-            color: #2d1a1a;
+            color: #e6d6d0;
         }
 
         /* ===== CONCLUSÃO ===== */
         .conclusao-box {
-            background: linear-gradient(135deg, #f4f0ea, #e7ecf3);
+            background: linear-gradient(135deg, rgba(212, 163, 115, 0.05), rgba(11, 15, 21, 0.8));
             border-radius: var(--radius-xl);
             padding: 32px 36px;
             border-left: 10px solid var(--gold-aristotle);
             box-shadow: var(--shadow-soft);
             margin: 10px 0;
             position: relative;
+            border: 1px solid rgba(212, 163, 115, 0.06);
         }
 
         .conclusao-box p {
@@ -398,16 +415,17 @@
         }
 
         .conclusao-box strong {
-            color: #1b5e3a;
+            color: var(--gold-soft);
         }
 
-        /* ===== QUIZ ===== */
+        /* ===== QUIZ (DARK) ===== */
         .quiz-wrapper {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(6px);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: var(--radius-xl);
             padding: 30px 28px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             box-shadow: var(--shadow-soft);
             margin: 10px 0;
         }
@@ -423,36 +441,40 @@
         .quiz-header h3 {
             font-size: 2rem;
             font-weight: 700;
-            color: var(--blue-deep);
+            color: var(--text-dark);
         }
 
         .quiz-badge {
-            background: var(--blue-deep);
-            color: white;
+            background: rgba(212, 163, 115, 0.15);
+            color: var(--gold-aristotle);
             font-weight: 600;
             padding: 4px 20px;
             border-radius: 60px;
             font-size: 0.8rem;
+            border: 1px solid rgba(212, 163, 115, 0.1);
         }
 
         .quiz-legenda {
             color: var(--text-muted);
             margin-bottom: 28px;
             font-size: 0.95rem;
-            border-bottom: 1px solid rgba(0,0,0,0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             padding-bottom: 14px;
         }
 
         .pergunta-item {
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.03);
             border-radius: var(--radius-lg);
             padding: 20px 24px;
             margin-bottom: 18px;
-            border: 1px solid #eef0f3;
+            border: 1px solid rgba(255, 255, 255, 0.04);
             transition: all var(--transition);
         }
 
-        .pergunta-item:hover { border-color: #cdd4df; }
+        .pergunta-item:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
+        }
 
         .p-header {
             display: flex;
@@ -462,8 +484,8 @@
         }
 
         .p-num {
-            background: var(--blue-deep);
-            color: white;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-soft);
             width: 30px;
             height: 30px;
             display: flex;
@@ -472,6 +494,7 @@
             border-radius: 50%;
             font-weight: 700;
             font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .p-tag {
@@ -481,19 +504,20 @@
             letter-spacing: 0.8px;
             padding: 2px 16px;
             border-radius: 60px;
-            background: #eef2f6;
+            background: rgba(255, 255, 255, 0.04);
             color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        .p-tag.tag-aristoteles { background: rgba(182, 139, 64, 0.15); color: #7a5d2e; }
-        .p-tag.tag-bacon { background: rgba(161, 61, 61, 0.12); color: #8b2e2e; }
-        .p-tag.tag-comparativa { background: rgba(0, 0, 0, 0.04); color: #4a4a5a; }
+        .p-tag.tag-aristoteles { background: rgba(212, 163, 115, 0.12); color: var(--gold-aristotle); border-color: rgba(212, 163, 115, 0.08); }
+        .p-tag.tag-bacon { background: rgba(224, 90, 74, 0.10); color: var(--bacon-red); border-color: rgba(224, 90, 74, 0.08); }
+        .p-tag.tag-comparativa { background: rgba(255, 255, 255, 0.04); color: var(--text-soft); }
 
         .pergunta-item p {
             font-weight: 600;
             font-size: 1.05rem;
             margin-bottom: 10px;
-            color: var(--blue-deep);
+            color: var(--text-dark);
         }
 
         .pergunta-item label {
@@ -503,19 +527,29 @@
             border-radius: 10px;
             cursor: pointer;
             transition: background 0.15s;
-            position: relative;
+            color: var(--text-soft);
         }
 
-        .pergunta-item label:hover { background: #f5f7fc; }
+        .pergunta-item label:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-dark);
+        }
 
         .pergunta-item input[type="radio"] {
             margin-right: 12px;
             transform: scale(1.1);
             accent-color: var(--gold-aristotle);
+            filter: brightness(1.2);
         }
 
-        .pergunta-item.correta { border-left: 8px solid #2b8c4a; background: #f3faf5; }
-        .pergunta-item.errada { border-left: 8px solid #c0392b; background: #fdf3f2; }
+        .pergunta-item.correta {
+            border-left: 8px solid #3fb67a;
+            background: rgba(63, 182, 122, 0.06);
+        }
+        .pergunta-item.errada {
+            border-left: 8px solid #e05a4a;
+            background: rgba(224, 90, 74, 0.06);
+        }
 
         .feedback-detalhe {
             margin-top: 12px;
@@ -526,46 +560,61 @@
             font-size: 0.95rem;
         }
 
-        .pergunta-item.correta .feedback-detalhe { display: block; background: rgba(43, 140, 74, 0.06); color: #1b5e33; border: 1px solid rgba(43, 140, 74, 0.12); }
-        .pergunta-item.errada .feedback-detalhe { display: block; background: rgba(192, 57, 43, 0.05); color: #91261b; border: 1px solid rgba(192, 57, 43, 0.12); }
+        .pergunta-item.correta .feedback-detalhe {
+            display: block;
+            background: rgba(63, 182, 122, 0.08);
+            color: #7ad0a8;
+            border: 1px solid rgba(63, 182, 122, 0.12);
+        }
+        .pergunta-item.errada .feedback-detalhe {
+            display: block;
+            background: rgba(224, 90, 74, 0.08);
+            color: #f0a89a;
+            border: 1px solid rgba(224, 90, 74, 0.12);
+        }
 
         .btn-verificar {
-            background: var(--blue-deep);
-            color: white;
+            background: var(--gold-aristotle);
+            color: #0b0f15;
             font-size: 1.2rem;
-            font-weight: 600;
+            font-weight: 700;
             padding: 14px 48px;
             border: none;
             border-radius: 60px;
             cursor: pointer;
             transition: all var(--transition);
             margin-top: 16px;
-            box-shadow: 0 8px 24px rgba(10, 26, 43, 0.2);
+            box-shadow: 0 8px 30px rgba(212, 163, 115, 0.15);
         }
 
         .btn-verificar:hover {
-            background: #142d47;
+            background: #e8c48a;
             transform: scale(1.02) translateY(-2px);
-            box-shadow: 0 12px 32px rgba(10, 26, 43, 0.3);
+            box-shadow: 0 12px 40px rgba(212, 163, 115, 0.25);
         }
 
         .resultado-final {
             margin-top: 28px;
             padding: 22px 30px;
             border-radius: var(--radius-lg);
-            background: #ffffff;
-            border: 2px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             text-align: center;
             display: none;
             font-size: 1.3rem;
             font-weight: 700;
-            color: var(--blue-deep);
+            color: var(--text-dark);
             box-shadow: var(--shadow-soft);
             animation: fadeSlideUp 0.5s ease;
         }
 
         .resultado-final.mostrar { display: block; }
-        .resultado-final .nota { font-size: 2.6rem; display: inline-block; margin-right: 12px; }
+        .resultado-final .nota {
+            font-size: 2.6rem;
+            display: inline-block;
+            margin-right: 12px;
+            color: var(--gold-aristotle);
+        }
 
         @keyframes fadeSlideUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -576,7 +625,7 @@
         .footer-site {
             margin-top: 40px;
             padding-top: 24px;
-            border-top: 1px solid rgba(0, 0, 0, 0.04);
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
             text-align: center;
             color: var(--text-muted);
             font-size: 0.9rem;
@@ -918,18 +967,18 @@
                 perguntaDiv.classList.add('errada');
             }
 
-            // Marca a opção correta em verde claro (destaque) e a errada em vermelho se o usuário errou
+            // Marca a opção correta em destaque e a errada se for o caso
             radios.forEach((radio, idx) => {
                 const label = radio.parentElement;
                 if (idx === correto) {
                     label.style.fontWeight = '700';
-                    label.style.color = '#1b5e33';
+                    label.style.color = '#7ad0a8';
                 } else if (idx === selecionado && selecionado !== correto) {
                     label.style.fontWeight = '700';
-                    label.style.color = '#91261b';
+                    label.style.color = '#f0a89a';
                 } else {
                     label.style.fontWeight = 'normal';
-                    label.style.color = 'inherit';
+                    label.style.color = 'var(--text-soft)';
                 }
             });
         }
